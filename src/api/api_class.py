@@ -7,7 +7,7 @@ from bot import bot_class
 class Event:
     """ 
     --Tass created Feb 15 2023--
-    last update March 3 2023
+    last update March 7 2023
     
     A class used to 
     - dump timestamp from trading book
@@ -16,9 +16,11 @@ class Event:
     """
     def __init__(self):
         self._HIST_PATH = None
+        
+    def display_graph(self):
     
-    def dump_history(self, timestamp):
-        return
+    def position_panel(self, timestamp):
+        return timestamp
            
     def display_model():
         return
@@ -63,9 +65,9 @@ class Execution:
     def login(self, api, secret):
         self._API_KEY = api
         self._SECRET = secret
-        self.set_client()
-        self.set_account()
-        print("LOGIN SUCCEED!")
+        if (self.set_client() and self.set_account()):
+            return 1
+        return 0
         
     def create_bot(self, symbol, timeframe='5Min', rsi_period=14,rsi_upper=70,rsi_lower=30):
         self.BOTS[symbol] = bot_class.BOT (

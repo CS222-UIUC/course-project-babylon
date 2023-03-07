@@ -1,6 +1,6 @@
 import alpaca_trade_api as tradeapi
-import talib
 import time
+import datetime
 
 class BOT:
     """ 
@@ -60,28 +60,45 @@ class BOT:
                 return True
         return False
 
-    def open_position(self, dir):
+    def open_position(self, dir, qty): # 1 is long, 0 is short
         # Place a short sell order for the symbol
-        self.api.submit_order(
+        if (dir==1): side = "buy"
+        else: side = "sell"
+        order = self.api.submit_order(
             symbol=self.symbol,
-            qty=1,
-            side=dir,
+            qty=qty,
+            side=side,
             type='market',
             time_in_force='gtc'
         )
+        executed_at = order.submitted_at
+        print(f"Opened position with order ID {order.id} at {executed_at}")
+        return [ executed_at, order, "open", side, qty]
         
-    def close_position(self, dir):
-        # Close the short position for the symbol
-        positions = self.api.list_positions()
-        for position in positions:
-            if position.symbol == self.symbol and position.side == 'sell':
-                self.api.submit_order(
-                    symbol=self.symbol,
-                    qty=abs(int(float(position.qty))),
-                    side=dir,
-                    type='market',
-                    time_in_force='gtc'
-                )
+    def close_position(self, order_id, percent):
+        position = self.api.get_position(self.symbol)
+        qty = abs(int(float(position.qty)))
+        
+        # Calculate the quantity to close based on the specified percentage
+        close_qty = int(qty * percent)
+        
+        order = self.api.submit_order(
+            symbol=self.symbol,
+            qty=close_qty, #abs(int(float(position.qty)))
+            side='buy' if position.side == 'short' else 'sell',
+            type='market',
+            time_in_force='gtc',
+            order_class='simple',
+            client_order_id=order_id
+        )
+        executed_at = order.submitted_at
+        print(f"Closed position with order ID {order.id} at {executed_at}")
+        return [ executed_at, order, "close", close_qty]
+    
+    
+    def cancel_position(self, order_id):
+        self.api.cancel_order(order_id)
+        
     def printURL(self):
         return print("Base URL: ", self.BASE_URL)
     
@@ -97,6 +114,8 @@ class BOT:
             type='market', 
             time_in_force='gtc'
         )
+        
+        
     def submit_limit_order(self, symb, qty, dir):
         move = 'buy'
         if dir == 0: move = 'sell'
