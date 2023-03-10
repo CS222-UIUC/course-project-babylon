@@ -20,7 +20,7 @@ class Event:
     def display_graph(self):
     
     def position_panel(self, timestamp):
-        return timestamp
+        return 0
            
     def display_model():
         return

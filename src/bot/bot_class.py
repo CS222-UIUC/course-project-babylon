@@ -81,7 +81,6 @@ class BOT:
         
         # Calculate the quantity to close based on the specified percentage
         close_qty = int(qty * percent)
-        
         order = self.api.submit_order(
             symbol=self.symbol,
             qty=close_qty, #abs(int(float(position.qty)))
