@@ -2,11 +2,12 @@ import os
 import alpaca_trade_api as tradeapi
 from alpaca.trading.client import TradingClient
 from math import floor
+from bot import bot_class
 
 class Event:
     """ 
     --Tass created Feb 15 2023--
-    last update Feb 28 2023
+    last update March 7 2023
     
     A class used to 
     - dump timestamp from trading book
@@ -15,9 +16,11 @@ class Event:
     """
     def __init__(self):
         self._HIST_PATH = None
+        
+    def display_graph(self):
     
-    def dump_history(self, timestamp):
-        return
+    def position_panel(self, timestamp):
+        return timestamp
            
     def display_model():
         return
@@ -51,6 +54,7 @@ class Execution:
     def __init__(self):
         self._SYMBOLS = []
         self._BOTS = {}
+        self.bot = None
         self._API_KEY = None
         self._SECRET = None
         self.BASE_URL = 'https://paper-api.alpaca.markets'
@@ -61,9 +65,21 @@ class Execution:
     def login(self, api, secret):
         self._API_KEY = api
         self._SECRET = secret
-        self.set_client()
-        self.set_account()
-        print("LOGIN SUCCEED!")
+        if (self.set_client() and self.set_account()):
+            return 1
+        return 0
+        
+    def create_bot(self, symbol, timeframe='5Min', rsi_period=14,rsi_upper=70,rsi_lower=30):
+        self.BOTS[symbol] = bot_class.BOT (
+            api = self.trading_client,
+            symbol=symbol,
+            timeframe=timeframe,
+            rsi_period=rsi_period,
+            rsi_upper=rsi_upper,
+            rsi_lower=rsi_lower
+        )
+        
+        
         
     def set_account(self):
         if self.trading_client != None:
@@ -93,7 +109,7 @@ class Execution:
         if valid_symbol==None:
             return None
         self._SYMBOLS.append(valid_symbol)
-        self._BOTS[valid_symbol] = -1 #unset
+        self._BOTS[valid_symbol] = None #unset
         
     def get_symbols(self):
         return self._SYMBOLS
@@ -117,10 +133,10 @@ class Execution:
         del self._BOTS[valid_symbol]
     
     def start_bot(self, symbol):
-        self._BOTS[symbol] = 1
+        self._BOTS[symbol].start()
     
     def pause_bot(self, symbol):
-        self._BOTS[symbol] = 0
+        self._BOTS[symbol].pause()
         
     def reset_bot(self, symbol):
         self._BOTS[symbol] = -1
