@@ -3,48 +3,25 @@ import alpaca_trade_api as tradeapi
 from alpaca.trading.client import TradingClient
 from math import floor
 from bot import bot_class
+import pandas as pd
 
-class Event:
-    """ 
-    --Tass created Feb 15 2023--
-    last update March 7 2023
+df = pd.read_csv("logs_database.csv")
+
+API_KEY, SECRET_KEY, BASE_URL,CLIENT_API = None
+
+def LOGIN(key, secret):
+    url = 'https://paper-api.alpaca.markets'
+    return key, secret, url,tradeapi.REST(key_id= key, secret_key=secret, base_url=url)
     
-    A class used to 
-    - dump timestamp from trading book
-    - help frontend recieve bot ececution records, graph, and related information.
-    
-    """
-    def __init__(self):
-        self._HIST_PATH = None
-        
-    def display_graph(self):
-    
-    def position_panel(self, timestamp):
-        return 0
-           
-    def display_model():
-        return
-        
-    def get_book():
-        return
-    
-    def print_latest_order():
-        return
-        
-    def print_all_orders():
-        return
-        
-    def update_model():
-        return
-        
-    def update_book():
-        return
-        
-        
+def LOGOUT(self):
+    return None,None,None,None
+
+
 
 class Execution:
     """ 
     --Tass created Feb 15 2023--
+    last update March 10 2023
     
     A class used to 
     - add, delete crypto symbols that bot control
@@ -55,23 +32,13 @@ class Execution:
         self._SYMBOLS = []
         self._BOTS = {}
         self.bot = None
-        self._API_KEY = None
-        self._SECRET = None
-        self.BASE_URL = 'https://paper-api.alpaca.markets'
-        self.trading_client = None
         self.account = None
         self.cash_to_spend = 0;
     
-    def login(self, api, secret):
-        self._API_KEY = api
-        self._SECRET = secret
-        if (self.set_client() and self.set_account()):
-            return 1
-        return 0
         
     def create_bot(self, symbol, timeframe='5Min', rsi_period=14,rsi_upper=70,rsi_lower=30):
         self.BOTS[symbol] = bot_class.BOT (
-            api = self.trading_client,
+            api = CLIENT_API,
             symbol=symbol,
             timeframe=timeframe,
             rsi_period=rsi_period,
@@ -80,20 +47,12 @@ class Execution:
         )
         
         
-        
     def set_account(self):
-        if self.trading_client != None:
-            self.account = self.trading_client.get_account()
+        if CLIENT_API != None:
+            self.account = CLIENT_API.get_account()
         else:
             print("set_account: NO CLIENT FOUND")
     
-    def set_client(self):
-        if self._API_KEY != None and self._SECRET!= None:
-            #self.trading_client = TradingClient('api-key', 'secret-key', paper=True)
-            self.trading_client = tradeapi.REST(key_id= self._API_KEY, secret_key=self._SECRET, base_url=self.BASE_URL)
-            print("set_client: SUCCEED")
-        else:
-            print("set_client: KEYS INVALID")
     
     def get_account_cash(self):
         return float(self.account.cash)
@@ -149,23 +108,41 @@ class Execution:
         
     def reset_all_bots(self):
         for bot in self._BOTS: self.reset_bot(bot)
-    
-    
+        
     def get_user_info(self):
-        if self._API_KEY==None or self._SECRET==None:
+        if API_KEY==None or SECRET_KEY==None:
             print("[set_user_info]: KEY INVALID")
         return self.account
-    
-    def set_user_info(self, new_key, new_secret):
-        self._API_KEY = new_key
-        self._SECRET = new_secret
-    
-    def clear_user_info(self):
-        self._API_KEY = None
-        self._SECRET = None
     
     def test_print(self):
         return "i can print!"
         
     
+
+
+class Events:
+    """ 
+    --Tass created Feb 15 2023--
+    last update March 10 2023
     
+    A class used to 
+    - dump logs from csv file
+    - help frontend recieve bot ececution records, graph, and related information.
+    
+    """
+    def __init__(self, symbol):
+        self.DATABASE = df[df["Symbol"]]
+        self.SYMBOL = symbol
+        
+    def display_graph(self):
+        
+    
+    def dump_latest_logs(self, qty):
+        
+           
+    def delete_logs(self): #permanently delete logs records
+        
+        
+        
+
+        
