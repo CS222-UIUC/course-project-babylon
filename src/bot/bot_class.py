@@ -1,7 +1,9 @@
 import alpaca_trade_api as tradeapi
 import time
 import datetime
+from api import logs_database
 
+file = logs_database
 class BOT:
     """ 
     --Tass created Feb 16 2023--
@@ -73,6 +75,7 @@ class BOT:
         )
         executed_at = order.submitted_at
         print(f"Opened position with order ID {order.id} at {executed_at}")
+        
         return [ executed_at, order, "open", side, qty]
         
     def close_position(self, order_id, percent):

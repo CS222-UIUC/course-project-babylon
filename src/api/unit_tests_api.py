@@ -6,7 +6,7 @@ TASS ONLY API TEST KEY
 """
 API_KEY = "PK32AI2DQDHK074B5IMR"
 SECRET_KEY = "MwoUg7Q9cjDoh8cbTnbQrAXV8rJh7cQYpZ9vCQin"
-
+LOGIN(API_KEY, SECRET_KEY)
 class Test_API_CLASS(unittest.TestCase):
     def test_print(self):
         user = Execution()
@@ -57,9 +57,6 @@ class Test_API_CLASS(unittest.TestCase):
         
     def test_login(self):
         user = Execution()
-        user.login(API_KEY,SECRET_KEY)
-        #user.get_user_info()
-        #self.assertEqual(user.get_user_info(), [API_KEY, SECRET_KEY])
         self.assertEqual(user.get_account_cash(), 100000.0)
         
         
@@ -68,9 +65,9 @@ class Test_API_CLASS(unittest.TestCase):
         user = Execution()
         user.add_symbol("BTCUSDT")
         user.start_bot("USDT")
-        self.assertEqual(user._BOTS["USDT"], 1)
+        self.assertEqual(user._BOTS["USDT"].paused, False)
         user.pause_bot("USDT")
-        self.assertEqual(user._BOTS["USDT"], 0)
+        self.assertEqual(user._BOTS["USDT"].paused, True)
         user.reset_bot("USDT")
         self.assertEqual(user._BOTS["USDT"], -1)
 
