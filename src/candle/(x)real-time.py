@@ -7,6 +7,10 @@ deserted due to out-dated api format
 """
 API_KEY = "PKNKABC4NQ6UURX5RU4R"
 SECRET_KEY = "0GOzkmT1F5W9rs8czJ90YAXKZrBn6jee3BgGo9le"
+BASE_URL = 'https://paper-api.alpaca.markets'
+
+CLIENT_API = tradeapi.REST(key_id= API_KEY, secret_key=SECRET_KEY, base_url=BASE_URL)
+      
 
 import datetime
 import time
