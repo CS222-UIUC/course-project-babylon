@@ -131,7 +131,7 @@ class Events:
     
     """
     def __init__(self, symbol):
-        #self.DATABASE = df[df["Symbol"]]
+        self.df = file.loc[file['Symbol'] == symbol]
         self.SYMBOL = symbol
         
     def display_graph(self):
@@ -139,7 +139,7 @@ class Events:
         
     
     def dump_latest_logs(self): 
-        last_value = file.iloc[-1]
+        last_value = self.df.iloc[-1]
         return last_value
         
            
