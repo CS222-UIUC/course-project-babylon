@@ -6,14 +6,14 @@ TASS ONLY API TEST KEY
 """
 API_KEY = "PK32AI2DQDHK074B5IMR"
 SECRET_KEY = "MwoUg7Q9cjDoh8cbTnbQrAXV8rJh7cQYpZ9vCQin"
-LOGIN(API_KEY, SECRET_KEY)
+CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 class Test_API_CLASS(unittest.TestCase):
     def test_print(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         self.assertEqual(user.test_print(), "i can print!")
 
     def test_check_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         a1 = user.check_symbol("BTC USDT")
         a2 = user.check_symbol("btc eTh ")
         a3 = user.check_symbol("e t h s py")
@@ -28,7 +28,7 @@ class Test_API_CLASS(unittest.TestCase):
         #self.assertFalse('Foo'.isupper())
 
     def test_add_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         user.add_symbol("btc eth")
         user.add_symbol("SolonaUsdt")
         user.add_symbol("###")
@@ -40,7 +40,7 @@ class Test_API_CLASS(unittest.TestCase):
             
             
     def test_del_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         user.add_symbol("btc eth")
         user.add_symbol("SolonaUsdt")
         user.add_symbol("UST")
@@ -56,14 +56,15 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(user.get_symbols(), [])
         
     def test_login(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         self.assertEqual(user.get_account_cash(), 100000.0)
         
         
         
     def test_bot_status(self):
-        user = Execution()
-        user.add_symbol("BTCUSDT")
+        user = Execution(CLIENT_API)
+        user.add_symbol("USDT")
+        user.create_bot("USDT")
         user.start_bot("USDT")
         self.assertEqual(user._BOTS["USDT"].paused, False)
         user.pause_bot("USDT")
@@ -71,6 +72,17 @@ class Test_API_CLASS(unittest.TestCase):
         user.reset_bot("USDT")
         self.assertEqual(user._BOTS["USDT"], -1)
 
+    def test_dump_log(self):
+        user = Execution(CLIENT_API)
+        user.add_symbol("USDT")
+        user.create_bot("USDT")
+        event = Events("USDT")
+        log = event.dump_latest_logs()
+        print("============")
+        print(log)
+        print("============")
+        
+    
             
 
 if __name__ == '__main__':

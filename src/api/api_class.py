@@ -1,44 +1,40 @@
 import os
 import alpaca_trade_api as tradeapi
-from alpaca.trading.client import TradingClient
 from math import floor
 from bot import bot_class
+
 import pandas as pd
-
-df = pd.read_csv("logs_database.csv")
-
-API_KEY, SECRET_KEY, BASE_URL,CLIENT_API = None
+file = pd.read_csv("src/api/logs_database.csv")
 
 def LOGIN(key, secret):
     url = 'https://paper-api.alpaca.markets'
-    return key, secret, url,tradeapi.REST(key_id= key, secret_key=secret, base_url=url)
+    return tradeapi.REST(key_id= key, secret_key=secret, base_url=url)
     
 def LOGOUT(self):
     return None,None,None,None
 
-
-
 class Execution:
     """ 
     --Tass created Feb 15 2023--
-    last update March 10 2023
+    last update March 15 2023
     
     A class used to 
     - add, delete crypto symbols that bot control
     - start, pause the bot
     
     """
-    def __init__(self):
+    def __init__(self, CLIENT_API):
         self._SYMBOLS = []
         self._BOTS = {}
         self.bot = None
-        self.account = None
+        self.account = CLIENT_API.get_account()
         self.cash_to_spend = 0;
+        self.api = CLIENT_API
     
         
     def create_bot(self, symbol, timeframe='5Min', rsi_period=14,rsi_upper=70,rsi_lower=30):
-        self.BOTS[symbol] = bot_class.BOT (
-            api = CLIENT_API,
+        self._BOTS[symbol] = bot_class.BOT(
+            api = self.api,
             symbol=symbol,
             timeframe=timeframe,
             rsi_period=rsi_period,
@@ -48,8 +44,8 @@ class Execution:
         
         
     def set_account(self):
-        if CLIENT_API != None:
-            self.account = CLIENT_API.get_account()
+        if self.api != None:
+            self.account = self.api.get_account()
         else:
             print("set_account: NO CLIENT FOUND")
     
@@ -92,9 +88,15 @@ class Execution:
         del self._BOTS[valid_symbol]
     
     def start_bot(self, symbol):
-        self._BOTS[symbol].start()
+        if (self._BOTS[symbol]==None):
+            print("BOT not created")
+            return
+        self._BOTS[symbol].paused = False
     
     def pause_bot(self, symbol):
+        if (self._BOTS[symbol]==None):
+            print("BOT not created")
+            return
         self._BOTS[symbol].pause()
         
     def reset_bot(self, symbol):
@@ -110,8 +112,6 @@ class Execution:
         for bot in self._BOTS: self.reset_bot(bot)
         
     def get_user_info(self):
-        if API_KEY==None or SECRET_KEY==None:
-            print("[set_user_info]: KEY INVALID")
         return self.account
     
     def test_print(self):
@@ -131,16 +131,23 @@ class Events:
     
     """
     def __init__(self, symbol):
-        self.DATABASE = df[df["Symbol"]]
+        #self.DATABASE = df[df["Symbol"]]
         self.SYMBOL = symbol
         
     def display_graph(self):
+        return 0
         
     
-    def dump_latest_logs(self, qty):
+    def dump_latest_logs(self): 
+        last_value = file.iloc[-1]
+        return last_value
         
            
     def delete_logs(self): #permanently delete logs records
+        f = open("logs_database.csv", "w")
+        f.truncate()
+        f.close()
+        return 0
         
         
         
