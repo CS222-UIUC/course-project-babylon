@@ -1,9 +1,9 @@
 import alpaca_trade_api as tradeapi
 import time
 import datetime
-from api import logs_database
+import pandas as pd
 
-file = logs_database
+file = pd.read_csv("src/api/logs_database.csv")
 class BOT:
     """ 
     --Tass created Feb 16 2023--
@@ -22,9 +22,8 @@ class BOT:
         self.rsi_upper = rsi_upper
         self.rsi_lower = rsi_lower
         self.api = api
-        self.paused = False
-        
-        
+        self.paused = True
+
     def start(self):
         while not self.paused:
             try:
