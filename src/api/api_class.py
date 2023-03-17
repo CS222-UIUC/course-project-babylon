@@ -152,12 +152,12 @@ class Events:
     
     
     ## for frontend
-    # def display_log_titles(self):
-    #     st.title('Trade logs')
-    #     st.subheader(self.SYMBOL)
-    #     show_logs(self.SYMBOL)
-    #     st.subheader(self.SYMBOL)
-    #     show_logs(self.SYMBOL)
+        def display_log_titles(self):
+            st.title('Trade logs')
+            st.subheader(self.SYMBOL)
+            show_logs(self.SYMBOL)
+            st.subheader(self.SYMBOL)
+            show_logs(self.SYMBOL)
         
         
         

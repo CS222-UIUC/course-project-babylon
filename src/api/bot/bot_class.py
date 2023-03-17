@@ -188,3 +188,4 @@ class BOT:
     
 def update_log(timestamp, symbol, order_id, direction, qty):
     logs.append((timestamp, symbol, order_id, direction, qty))
+    print("logs updated")
