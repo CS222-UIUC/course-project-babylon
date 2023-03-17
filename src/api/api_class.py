@@ -148,6 +148,7 @@ class Events:
            
     def delete_logs(self): #permanently delete logs records
         logs.clear()
+        return 0
     
     
     ## for frontend
