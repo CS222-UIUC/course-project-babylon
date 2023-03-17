@@ -3,7 +3,8 @@ import time
 import datetime
 import pandas as pd
 
-file = pd.read_csv("src/api/logs_database.csv")
+# file = pd.read_csv("src/api/logs_database.csv")
+logs = []
 class BOT:
     """ 
     --Tass created Feb 16 2023--
@@ -46,7 +47,8 @@ class BOT:
 
         # Check if RSI is above upper threshold and open a short position
         if rsi > self.rsi_upper:
-            if not self.has_short_position(): self.open_short_position()
+            if not self.has_short_position(): 
+                self.open_short_position()
 
         # Check if RSI is below lower threshold and close the short position
         elif rsi < self.rsi_lower:
@@ -74,19 +76,19 @@ class BOT:
         )
         executed_at = order.submitted_at
         print(f"Opened position with order ID {order.id} at {executed_at}")
-        
+        update_log(executed_at, self.symbol,  order.id, side, qty)
         return [ executed_at, order, "open", side, qty]
         
     def close_position(self, order_id, percent):
         position = self.api.get_position(self.symbol)
         qty = abs(int(float(position.qty)))
-        
+        side='buy' if position.side == 'short' else 'sell'
         # Calculate the quantity to close based on the specified percentage
         close_qty = int(qty * percent)
         order = self.api.submit_order(
             symbol=self.symbol,
             qty=close_qty, #abs(int(float(position.qty)))
-            side='buy' if position.side == 'short' else 'sell',
+            side=side,
             type='market',
             time_in_force='gtc',
             order_class='simple',
@@ -94,6 +96,7 @@ class BOT:
         )
         executed_at = order.submitted_at
         print(f"Closed position with order ID {order.id} at {executed_at}")
+        update_log(executed_at, self.symbol,  order.id, side, qty)
         return [ executed_at, order, "close", close_qty]
     
     
@@ -180,3 +183,8 @@ class BOT:
         for position in portfolio:
             print("{} shares of {}".format(position.qty, position.symbol))
         return portfolio
+    
+    
+    
+def update_log(timestamp, symbol, order_id, direction, qty):
+    logs.append((timestamp, symbol, order_id, direction, qty))
