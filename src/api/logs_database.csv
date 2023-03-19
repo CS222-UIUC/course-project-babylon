@@ -1,2 +1,2 @@
-Symbol, executed_at, order_id, action, dir,qty
-USDT, 2022, 123, open, buy, 1.0
+symbol, timestamp, order_id, direction, qty
+USDT, 2022, 123, buy, 1.0

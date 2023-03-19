@@ -2,9 +2,10 @@ import os
 import alpaca_trade_api as tradeapi
 from math import floor
 from bot import bot_class
+import streamlit as st
+logs = bot_class.logs
 
 import pandas as pd
-file = pd.read_csv("src/api/logs_database.csv")
 
 def LOGIN(key, secret):
     url = 'https://paper-api.alpaca.markets'
@@ -131,23 +132,32 @@ class Events:
     
     """
     def __init__(self, symbol):
-        self.df = file.loc[file['Symbol'] == symbol]
+        self.filtered_logs = [log_entry for log_entry in logs if log_entry[1] == symbol]
         self.SYMBOL = symbol
         
     def display_graph(self):
         return 0
         
-    
-    def dump_latest_logs(self): 
-        last_value = self.df.iloc[-1]
-        return last_value
-        
+    def show_logs(self):
+        logs_text = ''
+        for log_entry in self.filtered_logs[::-1]:
+            # Add each log entry to the beginning of the log text
+            logs_text = f'{log_entry[0]} {log_entry[1]} {log_entry[2]} {log_entry[3]} {log_entry[4]}\n' + logs_text
+        # Display the logs in a reactive text area component
+        st.text_area(f'Logs for {self.SYMBOL}', value=logs_text, key=self.SYMBOL)
            
     def delete_logs(self): #permanently delete logs records
-        f = open("logs_database.csv", "w")
-        f.truncate()
-        f.close()
+        logs.clear()
         return 0
+    
+    
+    ## for frontend
+        def display_log_titles(self):
+            st.title('Trade logs')
+            st.subheader(self.SYMBOL)
+            show_logs(self.SYMBOL)
+            st.subheader(self.SYMBOL)
+            show_logs(self.SYMBOL)
         
         
         

@@ -72,15 +72,15 @@ class Test_API_CLASS(unittest.TestCase):
         user.reset_bot("USDT")
         self.assertEqual(user._BOTS["USDT"], -1)
 
-    def test_dump_log(self):
-        user = Execution(CLIENT_API)
-        user.add_symbol("USDT")
-        user.create_bot("USDT")
-        event = Events("USDT")
-        log = event.dump_latest_logs()
-        print("============")
-        print(log)
-        print("============")
+    # def test_dump_log(self):
+    #     user = Execution(CLIENT_API)
+    #     user.add_symbol("USDT")
+    #     user.create_bot("USDT")
+    #     event = Events("USDT")
+    #     log = event.dump_latest_logs()
+    #     print("============")
+    #     print(log)
+    #     print("============")
         
     
             
