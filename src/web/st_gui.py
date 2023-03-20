@@ -1,4 +1,3 @@
-
 import pandas as pd
 import mplfinance as mpf
 from datetime import datetime
@@ -8,35 +7,43 @@ import plotly
 import streamlit as st
 
 file = "/Users/yunfanhu/course-project-babylon/src/web/AMZN.csv"
-#file = "AMZN.csv"
+# file = "AMZN.csv"
 data = pd.read_csv(file)
 data.Date = pd.to_datetime(data.Date)
-#data.info()
-data = data.set_index('Date')
+# data.info()
+data = data.set_index("Date")
 
 file2 = "/Users/yunfanhu/course-project-babylon/src/web/TSLA.csv"
-#= "TSLA.csv"
+# = "TSLA.csv"
 data2 = pd.read_csv(file2)
 data2.Date = pd.to_datetime(data2.Date)
-#data.info()
-data2 = data2.set_index('Date')
+# data.info()
+data2 = data2.set_index("Date")
 
-df= pd.read_csv( file)
-df = df.set_index(pd.DatetimeIndex(df['Date'].values))
-figure = go.Figure(data = [
-    go.Candlestick(x=df.index,low = df['Low'],high = df['High'],open=df['Open'],close = df ['Close'])
-])
+df = pd.read_csv(file)
+df = df.set_index(pd.DatetimeIndex(df["Date"].values))
+figure = go.Figure(
+    data=[
+        go.Candlestick(
+            x=df.index,
+            low=df["Low"],
+            high=df["High"],
+            open=df["Open"],
+            close=df["Close"],
+        )
+    ]
+)
 
 figure.update_layout(
-    title = 'Amazon Price',
-    yaxis_title = 'Amazon Stock Price USD ($)',
-    xaxis_title = 'Date'
+    title="Amazon Price", yaxis_title="Amazon Stock Price USD ($)", xaxis_title="Date"
 )
 # figure.show()
 
 if __name__ == "__main__":
-    
-    title_placeholder = st.empty() # Creates an empty placeholder so that the text in it can be changed later
+
+    title_placeholder = (
+        st.empty()
+    )  # Creates an empty placeholder so that the text in it can be changed later
     title_placeholder.title("Select a stock on the left")
     current = ""
     with st.sidebar:
@@ -44,13 +51,14 @@ if __name__ == "__main__":
 
         stocks = ["AMZN", "TSLA", "LMT"]
         for stock in stocks:
-            if st.button(stock, use_container_width = True):
+            if st.button(stock, use_container_width=True):
                 current = stock
                 title_placeholder.title(stock)
-            
-    
-    if (current != ""):
-        tab1, tab2, tab3, tab4 = st.tabs(["Trading History", "Graph", "Bot Info", "Settings"])
+
+    if current != "":
+        tab1, tab2, tab3, tab4 = st.tabs(
+            ["Trading History", "Graph", "Bot Info", "Settings"]
+        )
         # data = [data, data2]
         with tab1:
             if current == "AMZN":
