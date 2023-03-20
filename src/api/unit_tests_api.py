@@ -8,8 +8,8 @@ from src.api.api_class import *
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = "PK32AI2DQDHK074B5IMR"
-SECRET_KEY = "MwoUg7Q9cjDoh8cbTnbQrAXV8rJh7cQYpZ9vCQin"
+API_KEY = None  # fill by yourself, don't push to git
+SECRET_KEY = None
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 
 
