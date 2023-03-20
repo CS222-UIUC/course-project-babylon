@@ -1,10 +1,11 @@
 import os
 import alpaca_trade_api as tradeapi
-from math import floor
-from bot import bot_class
-import streamlit as st
-logs = bot_class.logs
 
+from math import floor
+# from srcbot import bot_class
+import streamlit as st
+from src.bot.bot_class import BOT, logs
+# logs = bot_class.logs
 import pandas as pd
 
 def LOGIN(key, secret):
@@ -34,7 +35,7 @@ class Execution:
     
         
     def create_bot(self, symbol, timeframe='5Min', rsi_period=14,rsi_upper=70,rsi_lower=30):
-        self._BOTS[symbol] = bot_class.BOT(
+        self._BOTS[symbol] = BOT(
             api = self.api,
             symbol=symbol,
             timeframe=timeframe,

@@ -7,20 +7,21 @@ import plotly.graph_objs as go
 import plotly
 import streamlit as st
 
-
-file = "AMZN.csv"
+file = "/Users/yunfanhu/course-project-babylon/src/web/AMZN.csv"
+#file = "AMZN.csv"
 data = pd.read_csv(file)
 data.Date = pd.to_datetime(data.Date)
 #data.info()
 data = data.set_index('Date')
 
-file2 = "TSLA.csv"
+file2 = "/Users/yunfanhu/course-project-babylon/src/web/TSLA.csv"
+#= "TSLA.csv"
 data2 = pd.read_csv(file2)
 data2.Date = pd.to_datetime(data2.Date)
 #data.info()
 data2 = data2.set_index('Date')
 
-df= pd.read_csv( "AMZN.csv")
+df= pd.read_csv( file)
 df = df.set_index(pd.DatetimeIndex(df['Date'].values))
 figure = go.Figure(data = [
     go.Candlestick(x=df.index,low = df['Low'],high = df['High'],open=df['Open'],close = df ['Close'])
