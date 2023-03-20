@@ -1,12 +1,18 @@
+import sys
+
+sys.path.append("..")
+
 import unittest
-from api_class import *
+from src.api.api_class import *
 
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = "PK32AI2DQDHK074B5IMR"
-SECRET_KEY = "MwoUg7Q9cjDoh8cbTnbQrAXV8rJh7cQYpZ9vCQin"
+API_KEY = None  # fill by yourself, don't push to git
+SECRET_KEY = None
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
+
+
 class Test_API_CLASS(unittest.TestCase):
     def test_print(self):
         user = Execution(CLIENT_API)
@@ -24,8 +30,8 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(a3, "ETHSPY")
         self.assertEqual(a4, None)
         self.assertEqual(a5, None)
-        
-        #self.assertFalse('Foo'.isupper())
+
+        # self.assertFalse('Foo'.isupper())
 
     def test_add_symbols(self):
         user = Execution(CLIENT_API)
@@ -37,8 +43,7 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(len(symbols), 2)
         for i in range(len(symbols)):
             self.assertEqual(symbols[i], s[i])
-            
-            
+
     def test_del_symbols(self):
         user = Execution(CLIENT_API)
         user.add_symbol("btc eth")
@@ -54,13 +59,11 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(user.get_symbols(), ["SOLONAUSDT"])
         user.delete_symbol("SOLONAUSDT")
         self.assertEqual(user.get_symbols(), [])
-        
+
     def test_login(self):
         user = Execution(CLIENT_API)
         self.assertEqual(user.get_account_cash(), 100000.0)
-        
-        
-        
+
     def test_bot_status(self):
         user = Execution(CLIENT_API)
         user.add_symbol("USDT")
@@ -81,9 +84,7 @@ class Test_API_CLASS(unittest.TestCase):
     #     print("============")
     #     print(log)
     #     print("============")
-        
-    
-            
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
