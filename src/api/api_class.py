@@ -16,7 +16,7 @@ def LOGIN(key, secret):
     return tradeapi.REST(key_id=key, secret_key=secret, base_url=url)
 
 
-def LOGOUT(self):
+def LOGOUT():
     return None, None, None, None
 
 
