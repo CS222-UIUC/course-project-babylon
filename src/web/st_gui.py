@@ -6,14 +6,14 @@ import plotly.graph_objs as go
 import plotly
 import streamlit as st
 
-file = "/Users/yunfanhu/course-project-babylon/src/web/AMZN.csv"
+file = "./AMZN.csv"
 # file = "AMZN.csv"
 data = pd.read_csv(file)
 data.Date = pd.to_datetime(data.Date)
 # data.info()
 data = data.set_index("Date")
 
-file2 = "/Users/yunfanhu/course-project-babylon/src/web/TSLA.csv"
+file2 = "./TSLA.csv"
 # = "TSLA.csv"
 data2 = pd.read_csv(file2)
 data2.Date = pd.to_datetime(data2.Date)
