@@ -49,8 +49,34 @@ if __name__ == "__main__":
     with st.sidebar:
         st.text("User: Unknown")
 
-        stocks = ["AMZN", "TSLA", "LMT"]
-        for stock in stocks:
+        # Initialize the session_state if it doesn't exist
+        if "stocks" not in st.session_state:
+            st.session_state["stocks"] = ["AMZN", "TSLA", "LMT"]
+
+        # Add an input text field for the user to input a new stock symbol
+        new_stock = st.text_input("Enter a new stock symbol:")
+
+        # Add a button to add the new stock to the list
+        if st.button("Add stock"):
+            new_stock = new_stock.upper()
+            if new_stock not in st.session_state["stocks"]:
+                st.session_state["stocks"].append(new_stock)
+            else:
+                st.write("Stock already in the list")
+
+        # Add an input text field for the user to input the stock symbol to delete
+        stock_to_delete = st.text_input("Enter the stock symbol to delete:")
+
+        # Add a button to delete the stock from the list
+        if st.button("Delete stock"):
+            stock_to_delete = stock_to_delete.upper()
+            if stock_to_delete in st.session_state["stocks"]:
+                st.session_state["stocks"].remove(stock_to_delete)
+                st.write("Stock deleted")
+            else:
+                st.write("Stock not found")
+
+        for stock in st.session_state["stocks"]:
             if st.button(stock, use_container_width=True):
                 current = stock
                 title_placeholder.title(stock)
