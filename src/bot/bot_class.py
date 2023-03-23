@@ -3,6 +3,7 @@ import time
 import datetime
 import pandas as pd
 
+
 # file = pd.read_csv("src/api/logs_database.csv")
 logs = []
 
@@ -41,7 +42,7 @@ class BOT:
 
     def run_strategy(self):
         # Get historical price data
-        bars = self.api.get_barset(self.symbol, self.timeframe, limit=self.rsi_period)
+        day_bars = self.api.get_barset(self.symbol, "day", limit=self.rsi_period)
         prices = bars[self.symbol].df["close"].values
 
         # Calculate RSI
@@ -185,6 +186,12 @@ class BOT:
         for position in portfolio:
             print("{} shares of {}".format(position.qty, position.symbol))
         return portfolio
+
+    def open_short_position(self):
+        pass
+
+    def close_short_position(self):
+        pass
 
 
 def update_log(timestamp, symbol, order_id, direction, qty):
