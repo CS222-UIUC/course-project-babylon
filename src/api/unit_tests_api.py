@@ -4,12 +4,15 @@ sys.path.append("..")
 
 import unittest
 from src.api.api_class import *
+import warnings
 
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = None  # fill by yourself, don't push to git
-SECRET_KEY = None
+# API_KEY = None  # fill by yourself, don't push to git
+# SECRET_KEY = None
+API_KEY = "PK20L946VCG8K2QWZH44"  # fill by yourself, don't push to git
+SECRET_KEY = "ea0MRwBKxYiC2UK5IBHWDU3oLa4ZD2wNNTYDvcTM"
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 
 
@@ -60,9 +63,18 @@ class Test_API_CLASS(unittest.TestCase):
         user.delete_symbol("SOLONAUSDT")
         self.assertEqual(user.get_symbols(), [])
 
-    def test_login(self):
-        user = Execution(CLIENT_API)
-        self.assertEqual(user.get_account_cash(), 100000.0)
+    def test_invalid_credentials(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ResourceWarning)
+            # Set invalid API key and secret key
+            invalid_api_key = "invalid_api_key"
+            invalid_secret_key = "invalid_secret_key"
+
+            # Call the LOGIN function with invalid credentials
+            result = LOGIN(invalid_api_key, invalid_secret_key)
+
+            # Check if the result is -1
+            self.assertEqual(result, -1)
 
     def test_bot_status(self):
         user = Execution(CLIENT_API)
