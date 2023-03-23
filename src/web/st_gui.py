@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from src.api import api_class
 import pandas as pd
 import mplfinance as mpf
 import pandas_datareader as web
@@ -7,15 +7,13 @@ import plotly.graph_objs as go
 import plotly
 import streamlit as st
 
-file = "./AMZN.csv"
-# file = "AMZN.csv"
+file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
 data.Date = pd.to_datetime(data.Date)
 # data.info()
 data = data.set_index("Date")
 
-file2 = "./TSLA.csv"
-# = "TSLA.csv"
+file2 = "src/web/TSLA.csv"
 data2 = pd.read_csv(file2)
 data2.Date = pd.to_datetime(data2.Date)
 # data.info()
@@ -128,7 +126,7 @@ def login_page():
         submit_button = st.form_submit_button("Login")
 
     if submit_button:
-        if api_key == "1234" and secret == "1234":  # Dummy login, this will need to be changed to real login
+        if api_class.LOGIN(api_key, secret) != -1:
             st.session_state["is_logged_in"] = True
             st.experimental_rerun()
         else:
