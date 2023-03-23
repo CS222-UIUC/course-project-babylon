@@ -15,9 +15,10 @@ def LOGIN(key, secret):
     url = "https://paper-api.alpaca.markets"
     try:
         client_api = tradeapi.REST(key_id=key, secret_key=secret, base_url=url)
+        client_api.get_account()
+        return client_api
     except Exception as e:
         return -1
-    return client_api
 
 
 def LOGOUT():
