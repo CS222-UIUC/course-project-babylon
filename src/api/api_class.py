@@ -13,7 +13,11 @@ import pandas as pd
 
 def LOGIN(key, secret):
     url = "https://paper-api.alpaca.markets"
-    return tradeapi.REST(key_id=key, secret_key=secret, base_url=url)
+    try:
+        client_api = tradeapi.REST(key_id=key, secret_key=secret, base_url=url)
+    except Exception as e:
+        return -1
+    return client_api
 
 
 def LOGOUT():

@@ -110,3 +110,19 @@ def get_positions():
             "There was an issue getting positions from Alpaca: {0}".format(e)
         )
     return btc_position
+
+
+# double RSI Strtegies
+# Daily above 60, current below 30, long when RSI close above 30, 1.5 risk reward ratio
+# Daily RSI below 40, current rsi above 70, short when RSI close below 70
+
+def double_rsi_strad(rsi: list):
+    sections = []
+    for i in range(len(rsi)):
+        if rsi[i] < 30:
+            section = 'oversold'
+        elif rsi[i] > 70:
+            section = 'overbought'
+        else:
+            section = None
+        sections.append(section)
