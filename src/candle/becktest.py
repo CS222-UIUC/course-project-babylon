@@ -5,6 +5,10 @@ from alpaca_trade_api.rest import TimeFrame
 # pandas for analysis
 import pandas as pd
 
+API_SECRET = "0GOzkmT1F5W9rs8czJ90YAXKZrBn6jee3BgGo9le"
+API_KEY = "PKNKABC4NQ6UURX5RU4R"
+BASE_URL = 'https://paper-api.alpaca.markets'
+
 # Plotly for charting
 import plotly.graph_objects as go
 import plotly.express as px
@@ -379,6 +383,14 @@ def SS_charts_n_sharp(
 if __name__ == "__main__":
     crypto_name = "ETH"
     stock_name = "BILI"
+    
+    alpaca, crypto_name, stock_name = backtest_set_up(API_KEY,API_SECRET,crypto_name,stock_name )
+    stock_df = get_stock_df(alpaca,stock_name)
+    stock2_df = get_stock_df(alpaca, "TSLA")
+    crypto_df = get_crtpyo_df(alpaca,crypto_name)
+    sharpe_ratio, cumulative_return_fig, SMA_fig, SMA_Crossovers_fig, strategy_performance_fig = SS_charts_n_sharp(stock_df,stock2_df, stock_name, "TSLA")
+    # sharpe_ratio, cumulative_return_fig, SMA_fig, SMA_Crossovers_fig, strategy_performance_fig = CS_charts_n_sharp(stock_df,crypto_df, stock_name,crypto_name)
+=======
     API_SECRET = "0GOzkmT1F5W9rs8czJ90YAXKZrBn6jee3BgGo9le"
     API_KEY = "PKNKABC4NQ6UURX5RU4R"
     BASE_URL = "https://paper-api.alpaca.markets"
@@ -396,7 +408,3 @@ if __name__ == "__main__":
         SMA_Crossovers_fig,
         strategy_performance_fig,
     ) = CS_charts_n_sharp(stock_df, crypto_df, stock_name, crypto_name)
-    cumulative_return_fig.show()
-    # SMA_fig.show()
-    # SMA_Crossovers_fig.show()
-    strategy_performance_fig.show()
