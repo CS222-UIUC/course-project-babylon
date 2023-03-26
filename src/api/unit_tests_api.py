@@ -1,19 +1,27 @@
+import sys
+
+sys.path.append("..")
+
 import unittest
-from api_class import *
+from src.api.api_class import *
+import warnings
 
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = "PK32AI2DQDHK074B5IMR"
-SECRET_KEY = "MwoUg7Q9cjDoh8cbTnbQrAXV8rJh7cQYpZ9vCQin"
-LOGIN(API_KEY, SECRET_KEY)
+API_KEY = None  # fill by yourself, don't push to git
+SECRET_KEY = None
+
+CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
+
+
 class Test_API_CLASS(unittest.TestCase):
     def test_print(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         self.assertEqual(user.test_print(), "i can print!")
 
     def test_check_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         a1 = user.check_symbol("BTC USDT")
         a2 = user.check_symbol("btc eTh ")
         a3 = user.check_symbol("e t h s py")
@@ -24,11 +32,11 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(a3, "ETHSPY")
         self.assertEqual(a4, None)
         self.assertEqual(a5, None)
-        
-        #self.assertFalse('Foo'.isupper())
+
+        # self.assertFalse('Foo'.isupper())
 
     def test_add_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         user.add_symbol("btc eth")
         user.add_symbol("SolonaUsdt")
         user.add_symbol("###")
@@ -37,10 +45,9 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(len(symbols), 2)
         for i in range(len(symbols)):
             self.assertEqual(symbols[i], s[i])
-            
-            
+
     def test_del_symbols(self):
-        user = Execution()
+        user = Execution(CLIENT_API)
         user.add_symbol("btc eth")
         user.add_symbol("SolonaUsdt")
         user.add_symbol("UST")
@@ -54,16 +61,24 @@ class Test_API_CLASS(unittest.TestCase):
         self.assertEqual(user.get_symbols(), ["SOLONAUSDT"])
         user.delete_symbol("SOLONAUSDT")
         self.assertEqual(user.get_symbols(), [])
-        
-    def test_login(self):
-        user = Execution()
-        self.assertEqual(user.get_account_cash(), 100000.0)
-        
-        
-        
+
+    def test_invalid_credentials(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ResourceWarning)
+            # Set invalid API key and secret key
+            invalid_api_key = "invalid_api_key"
+            invalid_secret_key = "invalid_secret_key"
+
+            # Call the LOGIN function with invalid credentials
+            result = LOGIN(invalid_api_key, invalid_secret_key)
+
+            # Check if the result is -1
+            self.assertEqual(result, -1)
+
     def test_bot_status(self):
-        user = Execution()
-        user.add_symbol("BTCUSDT")
+        user = Execution(CLIENT_API)
+        user.add_symbol("USDT")
+        user.create_bot("USDT")
         user.start_bot("USDT")
         self.assertEqual(user._BOTS["USDT"].paused, False)
         user.pause_bot("USDT")
@@ -71,7 +86,16 @@ class Test_API_CLASS(unittest.TestCase):
         user.reset_bot("USDT")
         self.assertEqual(user._BOTS["USDT"], -1)
 
-            
+    # def test_dump_log(self):
+    #     user = Execution(CLIENT_API)
+    #     user.add_symbol("USDT")
+    #     user.create_bot("USDT")
+    #     event = Events("USDT")
+    #     log = event.dump_latest_logs()
+    #     print("============")
+    #     print(log)
+    #     print("============")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
