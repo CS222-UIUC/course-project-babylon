@@ -73,10 +73,11 @@ class Execution:
 
     def add_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
-        if valid_symbol == None:
-            return None
+        if valid_symbol is None:
+            return False
         self._SYMBOLS.append(valid_symbol)
         self._BOTS[valid_symbol] = None  # unset
+        return True
 
     def get_symbols(self):
         return self._SYMBOLS
@@ -94,18 +95,19 @@ class Execution:
         valid_symbol = self.check_symbol(symbol)
         if valid_symbol not in self._SYMBOLS:
             print("[Symbol not found]")
-            return None
+            return False
         self._SYMBOLS.remove(valid_symbol)
         del self._BOTS[valid_symbol]
+        return True
 
     def start_bot(self, symbol):
-        if self._BOTS[symbol] == None:
+        if self._BOTS[symbol] is None:
             print("BOT not created")
             return
         self._BOTS[symbol].paused = False
 
     def pause_bot(self, symbol):
-        if self._BOTS[symbol] == None:
+        if self._BOTS[symbol] is None:
             print("BOT not created")
             return
         self._BOTS[symbol].pause()
