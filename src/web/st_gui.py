@@ -5,15 +5,17 @@ import pandas_datareader as web
 import plotly.graph_objs as go
 import plotly
 import streamlit as st
+from src.api import api_class
+import streamlit_authenticator as stauth
 
-file = "./AMZN.csv"
+file = "./src/web/AMZN.csv"
 # file = "AMZN.csv"
 data = pd.read_csv(file)
 data.Date = pd.to_datetime(data.Date)
 # data.info()
 data = data.set_index("Date")
 
-file2 = "./TSLA.csv"
+file2 = "./src/web/TSLA.csv"
 # = "TSLA.csv"
 data2 = pd.read_csv(file2)
 data2.Date = pd.to_datetime(data2.Date)
@@ -39,6 +41,9 @@ figure.update_layout(
 )
 # figure.show()
 
+username = None
+
+
 if __name__ == "__main__":
 
     title_placeholder = (
@@ -47,8 +52,7 @@ if __name__ == "__main__":
     title_placeholder.title("Select a stock on the left")
     current = ""
     with st.sidebar:
-        st.text("User: Unknown")
-
+        username = st.text_input("Username", "username")
         # Initialize the session_state if it doesn't exist
         if "stocks" not in st.session_state:
             st.session_state["stocks"] = ["AMZN", "TSLA", "LMT"]
