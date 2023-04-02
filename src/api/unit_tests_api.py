@@ -9,8 +9,8 @@ import warnings
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = "PKOQNDVM0R6J9YYPK1WW"  # fill by yourself, don't push to git
-SECRET_KEY = "n02lBPUmKHqz77QwjscHfgrWUoNz9CBWwFMnqS4B"
+API_KEY = None  # fill by yourself, don't push to git
+SECRET_KEY = None
 
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 
