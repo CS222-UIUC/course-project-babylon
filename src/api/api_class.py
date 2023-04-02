@@ -1,12 +1,13 @@
 import os
 import alpaca_trade_api as tradeapi
-
+import yfinance as yf
 from math import floor
 
 # from srcbot import bot_class
 import streamlit as st
 from src.bot.bot_class import BOT, logs
-
+from alpaca_trade_api.rest import REST, TimeFrame, TimeFrameUnit
+from datetime import timezone, datetime, timedelta
 # logs = bot_class.logs
 import pandas as pd
 
@@ -29,11 +30,11 @@ class Execution:
     """
     --Tass created Feb 15 2023--
     last update March 15 2023
-    
-    A class used to 
+
+    A class used to
     - add, delete crypto symbols that bot control
     - start, pause the bot
-    
+
     """
 
     def __init__(self, CLIENT_API):
@@ -45,7 +46,7 @@ class Execution:
         self.api = CLIENT_API
 
     def create_bot(
-        self, symbol, timeframe="5Min", rsi_period=14, rsi_upper=70, rsi_lower=30
+            self, symbol, timeframe="5Min", rsi_period=14, rsi_upper=70, rsi_lower=30
     ):
         self._BOTS[symbol] = BOT(
             api=self.api,
@@ -73,39 +74,45 @@ class Execution:
 
     def add_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
-        if valid_symbol == None:
-            return None
+        if valid_symbol is -1:
+            return False
         self._SYMBOLS.append(valid_symbol)
         self._BOTS[valid_symbol] = None  # unset
+        return True
 
     def get_symbols(self):
         return self._SYMBOLS
 
-    def check_symbol(self, symbol: str) -> str:
+    def check_symbol(self, symbol: str):
+        import requests
         if not symbol.replace(" ", "").isalnum():
             print("[INVALID SYMBOL] ", symbol)
-            return None
-
+            return -1
         # Valid, uniform format
         valid_symbol = symbol.replace(" ", "").upper()
-        return valid_symbol
+        try:
+            stock_info = yf.Ticker(valid_symbol).info["symbol"]
+            return valid_symbol
+        except:
+            return -1
 
     def delete_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
         if valid_symbol not in self._SYMBOLS:
             print("[Symbol not found]")
-            return None
+            return False
         self._SYMBOLS.remove(valid_symbol)
         del self._BOTS[valid_symbol]
+        return True
 
     def start_bot(self, symbol):
-        if self._BOTS[symbol] == None:
+        if self._BOTS[symbol] is None:
             print("BOT not created")
             return
         self._BOTS[symbol].paused = False
 
     def pause_bot(self, symbol):
-        if self._BOTS[symbol] == None:
+        if self._BOTS[symbol] is None:
             print("BOT not created")
             return
         self._BOTS[symbol].pause()
@@ -133,14 +140,14 @@ class Execution:
 
 
 class Events:
-    """ 
+    """
     --Tass created Feb 15 2023--
     last update March 10 2023
-    
-    A class used to 
+
+    A class used to
     - dump logs from csv file
     - help frontend recieve bot ececution records, graph, and related information.
-    
+
     """
 
     def __init__(self, symbol):
@@ -155,8 +162,8 @@ class Events:
         for log_entry in self.filtered_logs[::-1]:
             # Add each log entry to the beginning of the log text
             logs_text = (
-                f"{log_entry[0]} {log_entry[1]} {log_entry[2]} {log_entry[3]} {log_entry[4]}\n"
-                + logs_text
+                    f"{log_entry[0]} {log_entry[1]} {log_entry[2]} {log_entry[3]} {log_entry[4]}\n"
+                    + logs_text
             )
         # Display the logs in a reactive text area component
         st.text_area(f"Logs for {self.SYMBOL}", value=logs_text, key=self.SYMBOL)

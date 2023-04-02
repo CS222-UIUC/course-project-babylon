@@ -9,8 +9,8 @@ import warnings
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = None  # fill by yourself, don't push to git
-SECRET_KEY = None
+API_KEY = "PKOQNDVM0R6J9YYPK1WW"  # fill by yourself, don't push to git
+SECRET_KEY = "n02lBPUmKHqz77QwjscHfgrWUoNz9CBWwFMnqS4B"
 
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 
@@ -95,6 +95,20 @@ class Test_API_CLASS(unittest.TestCase):
     #     print("============")
     #     print(log)
     #     print("============")
+
+    def test_check_symbol_market(self):
+        user = Execution(CLIENT_API)
+        a1 = user.check_symbol("AAPL")
+        self.assertEqual("AAPL",a1)
+        a3 = user.check_symbol("TSLA")
+        self.assertEqual("TSLA", a3)
+        a4 = user.check_symbol("asdasd")
+        self.assertEqual(-1, a4)
+        a5 = user.check_symbol("BCCBCD")
+        self.assertEqual(-1, a5)
+
+
+
 
 
 if __name__ == "__main__":
