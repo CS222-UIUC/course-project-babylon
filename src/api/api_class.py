@@ -74,6 +74,7 @@ class Execution:
 
     def add_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
+
         if valid_symbol is -1:
             return False
         self._SYMBOLS.append(valid_symbol)

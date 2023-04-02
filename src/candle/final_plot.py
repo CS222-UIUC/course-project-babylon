@@ -19,8 +19,8 @@ def plot_data():
         figs.append(fig)
     return tics,figs
 
-tics,figs = plot_data()
-
-for plots in zip(tics,figs):
-    st.write(f'CandleSticks graph for {plots[0]}')
-    st.plotly_chart(plots[1])
+if __name__ == "__main__":
+    tics,figs = plot_data()
+    for plots in zip(tics,figs):
+        st.write(f'CandleSticks graph for {plots[0]}')
+        st.plotly_chart(plots[1])
