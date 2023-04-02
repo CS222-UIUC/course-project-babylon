@@ -5,7 +5,7 @@ import streamlit as st
 import dummy
 
 def plot_data():
-    df = pd.read_csv("bars.csv")
+    df = pd.read_csv("./src/candle/bars.csv")
     tic_groups = df.groupby(by=['tic'],sort=False)
     
     tics = []

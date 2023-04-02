@@ -96,6 +96,20 @@ class Test_API_CLASS(unittest.TestCase):
     #     print(log)
     #     print("============")
 
+    def test_check_symbol_market(self):
+        user = Execution(CLIENT_API)
+        a1 = user.check_symbol("AAPL")
+        self.assertEqual("AAPL",a1)
+        a3 = user.check_symbol("TSLA")
+        self.assertEqual("TSLA", a3)
+        a4 = user.check_symbol("asdasd")
+        self.assertEqual(-1, a4)
+        a5 = user.check_symbol("BCCBCD")
+        self.assertEqual(-1, a5)
+
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
