@@ -1,15 +1,20 @@
 import alpaca_trade_api as tradeapi
 import time
-import datetime
 import pandas as pd
-
-# file = pd.read_csv("src/api/logs_database.csv")
+import datetime as dt
+import pytz
+from alpaca_trade_api.rest import REST, TimeFrame
+from pip._internal import main as install
+install(["install","ta-lib"])
+import talib
 import logging
+
 logs = []
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
 
 def configure_logging():
     # Configure the logging module
@@ -40,7 +45,7 @@ class BOT:
         self.rsi_upper = rsi_upper
         self.rsi_lower = rsi_lower
         self.api = api
-        self.paused = True
+        self.paused = False
         self.logger = configure_logging()
 
     def start(self):
@@ -49,37 +54,48 @@ class BOT:
             try:
                 self.run_strategy()
             except Exception as e:
-                self.logger.info("=== Error in strategy ===")
-                print(f"Error in strategy: {e}")
+                self.logger.info(f"=== Error in strategy: {e} ===")
                 time.sleep(60)
 
     def pause(self):
         self.logger.info("=== Bot is paused ===")
         self.paused = True
 
+    def get_last14Days_bars(self):
+        _timeNow = dt.datetime.now(pytz.timezone('US/Central'))
+        _14DaysAgo = _timeNow - dt.timedelta(days=14)
+
+        _bars = self.api.get_bars(self.symbol, TimeFrame.Day,
+                                  start=_14DaysAgo.isoformat(),
+                                  end=None,
+                                  limit=14
+                                  )
+        return _bars
+
     def run_strategy(self):
         # Get historical price data
         # day_bars = self.api.get_barset(self.symbol, "day", limit=self.rsi_period)
-        bars = self.api.get_bars(self.symbol, "day", limit=self.rsi_period)
-        prices = bars[self.symbol].df["close"].values
+        bars = self.get_last14Days_bars()
+        prices = bars.df["close"]
 
         # Calculate RSI
-        rsi = talib.RSI(prices, timeperiod=self.rsi_period)[-1]
+        rsi = talib.RSI(prices, timeperiod=9)[-1]
+        self.logger.info(f"=== Try to get last 9Days RSI: {rsi} ===")
 
         # Check if RSI is above upper threshold and open a short position
         if rsi > self.rsi_upper:
             if not self.has_short_position():
                 self.open_position(0, 1)
         # Check if RSI is below lower threshold and close the short position
-        elif rsi < self.rsi_lower:
+        elif rsi < self.rsi_lower or rsi < 60:
             if self.has_short_position():
-                self.close_position(-1)
+                self.close_short_position()
 
     def has_short_position(self):
         # Check if there is an open short position for the symbol
         positions = self.api.list_positions()
         for position in positions:
-            if position.symbol == self.symbol and position.side == "sell":
+            if position.symbol == self.symbol and position.side == "short":
                 self.logger.info("Short Position Detected")
                 return True
         self.logger.info("Short Position Not Detected")
@@ -97,7 +113,7 @@ class BOT:
         executed_at = order.submitted_at
         self.logger.info(f"Opened position with order ID {order.id} at {executed_at}")
         self.logger.info(f"Side: {side} Qty: {qty}")
-        #update_log(executed_at, self.symbol, order.id, side, qty)
+        # update_log(executed_at, self.symbol, order.id, side, qty)
         return 1
 
     def close_position(self, order_id, percent):
@@ -118,7 +134,7 @@ class BOT:
         executed_at = order.submitted_at
         self.logger.info(f"Closed position with order ID {order.id} at {executed_at}")
         self.logger.info(f"Side: {side} Qty: {qty}")
-        #update_log(executed_at, self.symbol, order.id, side, qty)
+        # update_log(executed_at, self.symbol, order.id, side, qty)
         return 1
 
     def cancel_position(self, order_id):
@@ -211,7 +227,7 @@ class BOT:
         # Close the short position for the symbol
         positions = self.api.list_positions()
         for position in positions:
-            if position.symbol == self.symbol and position.side == 'sell':
+            if position.symbol == self.symbol and position.side == 'short':
                 order = self.api.submit_order(
                     symbol=self.symbol,
                     qty=abs(int(float(position.qty))),
@@ -221,4 +237,4 @@ class BOT:
                 )
                 self.logger.info(f"Closed short position with order ID {order.id}")
 
-
+        return 1

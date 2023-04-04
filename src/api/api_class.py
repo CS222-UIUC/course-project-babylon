@@ -46,7 +46,7 @@ class Execution:
         self.api = CLIENT_API
 
     def create_bot(
-            self, symbol, timeframe="5Min", rsi_period=14, rsi_upper=70, rsi_lower=30
+            self, symbol, timeframe="5Min", rsi_period=9, rsi_upper=70, rsi_lower=30
     ):
         self._BOTS[symbol] = BOT(
             api=self.api,
@@ -74,7 +74,6 @@ class Execution:
 
     def add_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
-
         if valid_symbol is -1:
             return False
         self._SYMBOLS.append(valid_symbol)
