@@ -76,8 +76,8 @@ class Execution:
         valid_symbol = self.check_symbol(symbol)
         if valid_symbol is -1:
             return False
-        self._SYMBOLS.append(valid_symbol)
-        self._BOTS[valid_symbol] = None  # unset
+        self._SYMBOLS.append(symbol)
+        self._BOTS[symbol] = None  # unset
         return True
 
     def get_symbols(self):
@@ -97,12 +97,11 @@ class Execution:
             return -1
 
     def delete_symbol(self, symbol: str):
-        valid_symbol = self.check_symbol(symbol)
-        if valid_symbol not in self._SYMBOLS:
+        if symbol not in self._SYMBOLS:
             print("[Symbol not found]")
             return False
-        self._SYMBOLS.remove(valid_symbol)
-        del self._BOTS[valid_symbol]
+        self._SYMBOLS.remove(symbol)
+        del self._BOTS[symbol]
         return True
 
     def start_bot(self, symbol):
