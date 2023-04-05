@@ -47,11 +47,14 @@ class BOT:
         self.api = api
         self.paused = False
         self.logger = configure_logging()
+        self.last_rsi = None
+        self.count = 0
 
     def start(self):
         self.logger.info("=== Bot is started ===")
         while not self.paused:
             try:
+                time.sleep(10)
                 self.run_strategy()
             except Exception as e:
                 self.logger.info(f"=== Error in strategy: {e} ===")
@@ -80,7 +83,13 @@ class BOT:
 
         # Calculate RSI
         rsi = talib.RSI(prices, timeperiod=9)[-1]
-        self.logger.info(f"=== Try to get last 9Days RSI: {rsi} ===")
+        if self.last_rsi is None:
+            self.last_rsi = rsi
+            self.logger.info(f"=== Try to get last 9Days RSI: {rsi} ===")
+        else:
+            if self.last_rsi != rsi:
+                self.logger.info(f"=== Try to get last 9Days RSI: {rsi} ===")
+                self.last_rsi = rsi
 
         # Check if RSI is above upper threshold and open a short position
         if rsi > self.rsi_upper:
@@ -97,8 +106,11 @@ class BOT:
         for position in positions:
             if position.symbol == self.symbol and position.side == "short":
                 self.logger.info("Short Position Detected")
+                self.count = 0
                 return True
-        self.logger.info("Short Position Not Detected")
+        if self.count == 0:
+            self.count = 1
+            self.logger.info("=== Signal Waiting: Short Position Not Detected ===")
         return False
 
     def open_position(self, dir, qty):  # 1 is long, 0 is short
