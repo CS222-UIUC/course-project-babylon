@@ -5,7 +5,7 @@ import datetime as dt
 import pytz
 from alpaca_trade_api.rest import REST, TimeFrame
 from pip._internal import main as install
-install(["install","ta-lib"])
+# install(["install","ta-lib"])
 import talib
 import logging
 
