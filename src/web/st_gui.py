@@ -70,6 +70,10 @@ def main_page():
     #     title_placeholder.title(st.session_state["current_stock"])
 
     with st.sidebar:
+        # User profile picture and user name
+        st.image("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", width=100)
+        st.text(f"Username: {st.session_state.api_key}")
+
         # Create a logout button
         
         if st.button("Logout"):
@@ -116,7 +120,7 @@ def main_page():
                 
     
     if st.session_state["current_stock"] != "":
-        # current = st.session_state["current_stock"]
+        current = st.session_state["current_stock"]
         title_placeholder.title(st.session_state["current_stock"])
         options = ["Trading History", "Graph", "Bot Info", "Settings"]
         selected_option = st.selectbox("Select an option", options)
