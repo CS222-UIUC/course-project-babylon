@@ -1,0 +1,28 @@
+内存占用：
+读取CSV文件（read_csv_file函数）：从CSV文件中读取数据并将其转换为Pandas DataFrame时每个CSV文件读取后都会占用基于文件大小的内存。
+数据清理（clean_data函数）：处理DataFrame文件，包括将时间列转换为时间索引，以及填修复无效/缺失数据。处理时的临时DataFrame会有内存占用。
+数据重采样和特征计算（process_data函数）：对每个文件的数据进行了不同频率的重采样（1分钟、5分钟、15分钟和30分钟），并计算特征。创建更多的DataFrame，并增加内存占用。但这是将数据分频段的必要占用。
+数据合并（merge_dataframes函数）：将所有文件的处理结果按频率合并到一起，形成一个整体的DataFrame。
+多进程处理（process_all_files函数）：基于multiprocessing.Pool对多个文件进行并行处理。多进程使得每个进程都会复制一份数据，导致O（n*m）倍的内存占用，n为进程数量，m为文件大小。
+优化可能性：
+在处理过程中及时删除不再需要的DataFrame，来释放内存。
+优化数据结构：使用更紧凑的数据结构来存储数据，如使用feather或apache arrow而不是hdf5来存储数据
+限制进程数量：多线程提高计算速度的同时牺牲了内存占用。过多的进程可能导致内存占用，可以根据具体的处理需求来控制multiprocessing.Pool的进程数量来平衡计算速度和内存占用。
+
+耗时：
+基于multiprocessing.Pool处理CSV文件，加速的程度取决于可用的CPU核心数量和正在处理的文件数量。
+解压缩文件（extract_zip函数）：基于zipfile.ZipFile解压缩文件会消耗时间。
+读取CSV文件（read_csv_file函数）：基于pd.read_csv读取文件。
+数据清理（clean_data函数）：重采样、修复“坏”数据。
+保存结果到HDF文件（save_merged_data_to_hdf函数）：基于to_hdf将合并后的DataFrame保存到HDF文件。
+
+I/O占用：
+读取CSV文件和写入HDF5文件是I/O密集型操作。这些操作的性能在很大程度上取决于系统的I/O能力。
+并行化I/O密集型任务可能并不总是会带来显著的加速，特别是如果I/O子系统成为瓶颈时。
+解压缩文件（extract_zip函数）：解压缩ZIP文件会根据压缩文件大小占用I/O。
+读取CSV文件（read_csv_file函数）：基于pd.read_csv读取CSV文件占用I/O。
+保存合并后的数据到HDF文件（save_merged_data_to_hdf函数）：基于to_hdf将合并后的DataFrame保存到HDF文件占用I/O。
+
+并行效率：
+基于multiprocessing.Pool和cpu_count()函数创建进程池，进程数量等于可用CPU核心数。
+由于给予的压缩包数据中的每个股票/日期所指代的数据几乎相等，所以任务分配的较为平均。
