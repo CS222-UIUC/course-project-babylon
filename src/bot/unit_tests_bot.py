@@ -4,8 +4,8 @@ from bot_class import *
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = "PKOQNDVM0R6J9YYPK1WW"  # fill by yourself, don't push to git
-SECRET_KEY = "n02lBPUmKHqz77QwjscHfgrWUoNz9CBWwFMnqS4B"
+API_KEY = ""  # fill by yourself, don't push to git
+SECRET_KEY = ""
 BASE_URL = "https://paper-api.alpaca.markets"
 
 CLIENT_API = tradeapi.REST(key_id=API_KEY, secret_key=SECRET_KEY, base_url=BASE_URL)
