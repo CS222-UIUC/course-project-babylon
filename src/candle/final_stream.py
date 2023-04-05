@@ -94,11 +94,11 @@ def plotting():
         st.plotly_chart(plots[1])
     return
 
-def start(self):
-        data_thread = threading.Thread(target=self.run_connection)
-        plot_thread = threading.Thread(target=self.plotting)
-        data_thread.start()
-        plot_thread.start()
+# def start(self):
+#         data_thread = threading.Thread(target=self.run_connection)
+#         plot_thread = threading.Thread(target=self.plotting)
+#         data_thread.start()
+#         plot_thread.start()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
@@ -111,10 +111,10 @@ if __name__ == "__main__":
         "bars.csv",
         columns_list=["time", "open", "high", "low", "close", "volume", "tic", "exchange","vwap"],
     )
-    # stream.subscribe_bars(trade_bars,'TSLA')
+    # stream.subscribe_bars(trade_bars,'LMT')
     stream.subscribe_crypto_bars(trade_bars, "ETHUSD")
     stream.subscribe_crypto_bars(trade_bars, "BTCUSD")
-    # run_connection(stream)
-    start()
+    run_connection(stream)
+    # start()
 
     print("Complete")
