@@ -143,7 +143,7 @@ def main_page():
             # else:
             #     st.text("This should be graph")
             print(current)
-            components.html(src.candle.grass.display_graph())
+            components.html(src.candle.grass.display_graph(current))
         elif selected_option == "Bot Info":
             current = st.session_state["current_stock"]
             print(current)
