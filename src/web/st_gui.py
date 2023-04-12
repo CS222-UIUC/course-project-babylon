@@ -7,6 +7,8 @@ import pandas_datareader as web
 import plotly.graph_objs as go
 import plotly
 import streamlit as st
+from src.api import api_class
+import streamlit_authenticator as stauth
 
 file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
@@ -39,6 +41,15 @@ figure.update_layout(
 )
 
 
+def home_page():
+    col_equity, col_buying_power, col_cash = st.columns(3)
+    col_equity.metric("Equity", st.session_state.execution.api.get_account().equity)
+    col_buying_power.metric("Buying Power", st.session_state.execution.api.get_account().buying_power)
+    col_cash.metric("Cash", st.session_state.execution.api.get_account().cash)
+
+def stock_page():
+    pass
+
 def main_page():
     # Initialize the execution class
     st.session_state.execution = Execution(st.session_state["login_credential"])
@@ -48,21 +59,28 @@ def main_page():
 
     if "current_stock" not in st.session_state:
         st.session_state["current_stock"] = ""
-
+        
     title_placeholder = (
         st.empty()
     )  # Creates an empty placeholder so that the text in it can be changed later
-    if st.session_state["current_stock"] == "":
-        title_placeholder.title("Select a stock on the left")
-    else:
-        title_placeholder.title(st.session_state["current_stock"])
+    # if st.session_state["current_stock"] == "":
+    #     title_placeholder.title("Select a stock on the left")
+        
+    # else:
+    #     title_placeholder.title(st.session_state["current_stock"])
 
     with st.sidebar:
+        # User profile picture and user name
+        st.image("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", width=100)
+        st.text(f"Username: {st.session_state.api_key}")
+
         # Create a logout button
+        
         if st.button("Logout"):
             st.session_state["is_logged_in"] = False
             st.experimental_rerun()
 
+        
         # Initialize the session_state if it doesn't exist
         if "stocks" not in st.session_state:
             st.session_state["stocks"] = ["AMZN", "TSLA", "LMT"]
@@ -76,6 +94,7 @@ def main_page():
             if new_stock not in st.session_state["stocks"] and st.session_state.execution.add_symbol(new_stock) is True:
                 st.session_state.running_state[new_stock] = False
                 st.session_state["stocks"].append(new_stock)
+                st.success("Stock added")
             else:
                 st.error("Stock already exists or invalid symbol")
 
@@ -91,14 +110,18 @@ def main_page():
                 st.success("Stock deleted")
             else:
                 st.error("Stock not found or delete failed")
-
+        if st.button("Home", use_container_width=True):
+            current = ""
+            st.session_state["current_stock"] = ""
         for stock in st.session_state["stocks"]:
             if st.button(stock, use_container_width=True):
                 st.session_state["current_stock"] = stock
-                title_placeholder.title(stock)
-
+                current = st.session_state["current_stock"]
+                
+    
     if st.session_state["current_stock"] != "":
         current = st.session_state["current_stock"]
+        title_placeholder.title(st.session_state["current_stock"])
         options = ["Trading History", "Graph", "Bot Info", "Settings"]
         selected_option = st.selectbox("Select an option", options)
 
@@ -140,7 +163,9 @@ def main_page():
             st.text("This is setting")
 
     else:
-        st.error("No stock selected")
+        title_placeholder.title("Select a stock on the left")
+        home_page()
+    #     st.error("No stock selected")
 
 
 
@@ -182,5 +207,6 @@ if __name__ == "__main__":
 
     if st.session_state["is_logged_in"]:
         main_page()
+        
     else:
         login_page()

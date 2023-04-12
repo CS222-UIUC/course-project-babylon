@@ -1,0 +1,35 @@
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+    <div class="tradingview-widget-container__widget"></div>
+    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/NYSE-AI/" rel="noopener" target="_blank"><span class="blue-text">AI stock price</span></a> by TradingView</div>
+    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
+    {
+    "symbols": [
+      [
+        "a",
+        "NYSE:AI|1D"
+      ]
+    ],
+    "chartOnly": false,
+    "width": 1000,
+    "height": 500,
+    "locale": "en",
+    "colorTheme": "light",
+    "autosize": false,
+    "showVolume": false,
+    "showMA": false,
+    "hideDateRanges": false,
+    "hideMarketStatus": false,
+    "hideSymbolLogo": false,
+    "scalePosition": "right",
+    "scaleMode": "Normal",
+    "fontFamily": "-apple-system, BlinkMacSystemFont, Trebuchet MS, Roboto, Ubuntu, sans-serif",
+    "fontSize": "10",
+    "noTimeScale": false,
+    "valuesTracking": "1",
+    "changeMode": "price-and-percent",
+    "chartType": "area"
+  }
+    </script>
+  </div>
+  <!-- TradingView Widget END -->
