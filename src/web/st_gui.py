@@ -143,6 +143,7 @@ def main_page():
         st.error("No stock selected")
 
 
+
 def login_page():
     with st.form("login_form"):
         api_key = st.text_input("Enter your API key:")
