@@ -1,3 +1,5 @@
+import time
+
 from src.api.api_class import *
 from src.candle.grass import *
 import pandas as pd
@@ -5,6 +7,7 @@ import mplfinance as mpf
 import pandas_datareader as web
 import plotly.graph_objs as go
 import streamlit as st
+import threading
 
 file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
@@ -37,10 +40,6 @@ figure.update_layout(
 )
 
 
-def stock_page():
-    pass
-
-
 def main_page():
     # Initialize the execution if it doesn't exist
     if "execution" not in st.session_state:
@@ -55,6 +54,10 @@ def main_page():
     if "current_stock" not in st.session_state:
         st.session_state["current_stock"] = ""
 
+    # Initialize the session_state if it doesn't exist
+    if "stocks" not in st.session_state:
+        st.session_state["stocks"] = ["BAC", "KO", "RACE"]
+
     title_placeholder = (
         st.empty()
     )  # Creates an empty placeholder so that the text in it can be changed later
@@ -65,24 +68,39 @@ def main_page():
     #     title_placeholder.title(st.session_state["current_stock"])
 
     with st.sidebar:
-        # User profile picture and user name
-        st.image("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", width=100)
-        st.text(f"API_KEY: {st.session_state.api_key}")
-
-        # Create a logout button
-
         col1, col2 = st.columns(2)
         with col1:
+            # User profile picture and user name
+            st.image("https://www.pngkit.com/png/full/165-1650218_at-the-movies-will-smith-meme-tada.png", width=145)
+        with col2:
+            if st.button("Dashboard", use_container_width=True):
+                st.session_state["current_stock"] = ""
             if st.button("Logout", use_container_width=True):
                 st.session_state["is_logged_in"] = False
                 st.experimental_rerun()
-        with col2:
-            if st.button("Home", use_container_width=True):
-                st.session_state["current_stock"] = ""
+        # Only display the first five characters of the user api key
+        st.text(f"API_KEY: {st.session_state.api_key[:5]}{'*' * 10}")
 
-        # Initialize the session_state if it doesn't exist
-        if "stocks" not in st.session_state:
-            st.session_state["stocks"] = ["BAC", "KO", "RACE"]
+        if "add_status" not in st.session_state:
+            st.session_state["add_status"] = 0  # 0 = not added, 1 = added, 2 = failed
+
+        if "delete_status" not in st.session_state:
+            st.session_state["delete_status"] = 0  # 0 = not deleted, 1 = deleted, 2 = failed
+
+        # Create an empty placeholder to display the success/failure message
+        message_placeholder = st.empty()
+        if st.session_state["add_status"] != 0:
+            if st.session_state["add_status"] == 1:
+                message_placeholder.success("Stock successfully added")
+            else:
+                message_placeholder.error("Stock already exists or invalid symbol")
+            st.session_state["add_status"] = 0
+        elif st.session_state["delete_status"] != 0:
+            if st.session_state["delete_status"] == 1:
+                message_placeholder.success("Stock successfully deleted")
+            else:
+                message_placeholder.error("Stock not found or delete failed")
+            st.session_state["delete_status"] = 0
 
         # Add an input text field for the user to input a new stock symbol
         new_stock = st.text_input("Enter a new stock symbol:")
@@ -94,9 +112,12 @@ def main_page():
                     and new_stock != "HOME" and st.session_state.execution.add_symbol(new_stock) is True:
                 st.session_state.running_state[new_stock] = False
                 st.session_state["stocks"].append(new_stock)
-                st.success("Stock added")
+                st.session_state["add_status"] = 1
+                st.experimental_rerun()
             else:
                 st.error("Stock already exists or invalid symbol")
+                st.session_state["add_status"] = 2
+                st.experimental_rerun()
 
         # Add an input text field for the user to input the stock symbol to delete
         stock_to_delete = st.text_input("Enter the stock symbol to delete:")
@@ -106,15 +127,18 @@ def main_page():
             stock_to_delete = stock_to_delete.upper()
             if stock_to_delete in st.session_state["stocks"] and st.session_state.execution.delete_symbol(
                     stock_to_delete) is True:
+                st.session_state["current_stock"] = ""
                 st.session_state.running_state.pop(stock_to_delete)
                 st.session_state["stocks"].remove(stock_to_delete)
-                st.success("Stock deleted")
+                st.session_state["delete_status"] = 1
+                st.experimental_rerun()
             else:
                 st.error("Stock not found or delete failed")
+                st.session_state["delete_status"] = 2
+                st.experimental_rerun()
 
-        print(st.session_state["stocks"])
         for stock in st.session_state["stocks"]:
-            if st.button(stock, use_container_width=True):
+            if st.button(stock, use_container_width=True, key=f"stock_button_{stock}"):
                 st.session_state["current_stock"] = stock
 
     if st.session_state["current_stock"] != "":
@@ -149,16 +173,16 @@ def main_page():
 
                 col1, col2, col3 = st.columns(3)
                 with col1:
-                    if st.button("Reset bot"):
+                    if st.button("Reset bot", use_container_width=True):
                         st.session_state.execution.reset_bot(current)
                         st.session_state.running_state[current] = False
                         st.experimental_rerun()
                 with col2:
-                    if st.button("Pause bot"):
+                    if st.button("Pause bot", use_container_width=True):
                         st.session_state.execution.pause_bot(current)
                         st.experimental_rerun()
                 with col3:
-                    if st.button("Start bot"):
+                    if st.button("Start bot", use_container_width=True):
                         st.session_state.execution.start_bot(current)
                         st.experimental_rerun()
         elif selected_option == "Settings":
