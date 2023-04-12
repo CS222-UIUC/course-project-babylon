@@ -41,15 +41,15 @@ def write_html_file(symbol):
   with open('src\candle\currentstock.html', 'w') as f:
       f.write(html)
 
-def display_graph(symbol='RTX'):
+def display_graph(symbol):
   file_name = 'currentstock.html'
   write_html_file(symbol)
-  st.header("test html import")
+  # st.header("test html import")
   HtmlFile = open('src\candle\currentstock.html', 'r', encoding='utf-8')
   source_code = HtmlFile.read() 
   # print(source_code)
   components.html(source_code,width=1000, height=500)
   return source_code
 
-part = display_graph()
+# part = display_graph()
 # components.html(part, header,descriotion)
