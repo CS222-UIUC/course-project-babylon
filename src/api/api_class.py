@@ -3,12 +3,10 @@ import alpaca_trade_api as tradeapi
 import yfinance as yf
 from math import floor
 
-# from srcbot import bot_class
 import streamlit as st
-from src.bot.bot_class import BOT, logs
+from src.bot.bot_class import BOT
 from alpaca_trade_api.rest import REST, TimeFrame, TimeFrameUnit
 from datetime import timezone, datetime, timedelta
-# logs = bot_class.logs
 import pandas as pd
 
 

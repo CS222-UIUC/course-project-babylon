@@ -1,16 +1,14 @@
-import sys
-
-sys.path.append("..")
-
+# import sys
+# sys.path.append("..")
 import unittest
-from src.api.api_class import *
+from api_class import *
 import warnings
 
 """
 TASS ONLY API TEST KEY
 """
-API_KEY = None  # fill by yourself, don't push to git
-SECRET_KEY = None
+API_KEY = "PKOQNDVM0R6J9YYPK1WW"  # fill by yourself, don't push to git
+SECRET_KEY = "n02lBPUmKHqz77QwjscHfgrWUoNz9CBWwFMnqS4B"
 
 CLIENT_API = LOGIN(API_KEY, SECRET_KEY)
 
