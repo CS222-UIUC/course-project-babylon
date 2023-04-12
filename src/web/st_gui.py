@@ -1,14 +1,10 @@
-import time
-from datetime import datetime
 from src.api.api_class import *
+from src.candle.grass import *
 import pandas as pd
 import mplfinance as mpf
 import pandas_datareader as web
 import plotly.graph_objs as go
-import plotly
 import streamlit as st
-from src.api import api_class
-import streamlit_authenticator as stauth
 
 file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
@@ -41,49 +37,52 @@ figure.update_layout(
 )
 
 
-def home_page():
-    col_equity, col_buying_power, col_cash = st.columns(3)
-    col_equity.metric("Equity", st.session_state.execution.api.get_account().equity)
-    col_buying_power.metric("Buying Power", st.session_state.execution.api.get_account().buying_power)
-    col_cash.metric("Cash", st.session_state.execution.api.get_account().cash)
-
 def stock_page():
     pass
 
+
 def main_page():
-    # Initialize the execution class
-    st.session_state.execution = Execution(st.session_state["login_credential"])
+    # Initialize the execution if it doesn't exist
+    if "execution" not in st.session_state:
+        st.session_state.execution = Execution(st.session_state["login_credential"])
+        st.session_state.execution.add_symbol("BAC")
+        st.session_state.execution.add_symbol("KO")
+        st.session_state.execution.add_symbol("RACE")
     # Create a dictionary to store the running state of each bot
     if "running_state" not in st.session_state:
-        st.session_state.running_state = {"AMZN": False, "TSLA": False, "LMT": False}
+        st.session_state.running_state = {"BAC": False, "KO": False, "RACE": False}
 
     if "current_stock" not in st.session_state:
         st.session_state["current_stock"] = ""
-        
+
     title_placeholder = (
         st.empty()
     )  # Creates an empty placeholder so that the text in it can be changed later
     # if st.session_state["current_stock"] == "":
     #     title_placeholder.title("Select a stock on the left")
-        
+
     # else:
     #     title_placeholder.title(st.session_state["current_stock"])
 
     with st.sidebar:
         # User profile picture and user name
         st.image("https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png", width=100)
-        st.text(f"Username: {st.session_state.api_key}")
+        st.text(f"API_KEY: {st.session_state.api_key}")
 
         # Create a logout button
-        
-        if st.button("Logout"):
-            st.session_state["is_logged_in"] = False
-            st.experimental_rerun()
 
-        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Logout", use_container_width=True):
+                st.session_state["is_logged_in"] = False
+                st.experimental_rerun()
+        with col2:
+            if st.button("Home", use_container_width=True):
+                st.session_state["current_stock"] = ""
+
         # Initialize the session_state if it doesn't exist
         if "stocks" not in st.session_state:
-            st.session_state["stocks"] = ["AMZN", "TSLA", "LMT"]
+            st.session_state["stocks"] = ["BAC", "KO", "RACE"]
 
         # Add an input text field for the user to input a new stock symbol
         new_stock = st.text_input("Enter a new stock symbol:")
@@ -91,7 +90,8 @@ def main_page():
         # Add a button to add the new stock to the list
         if st.button("Add stock"):
             new_stock = new_stock.upper()
-            if new_stock not in st.session_state["stocks"] and st.session_state.execution.add_symbol(new_stock) is True:
+            if new_stock not in st.session_state["stocks"] \
+                    and new_stock != "HOME" and st.session_state.execution.add_symbol(new_stock) is True:
                 st.session_state.running_state[new_stock] = False
                 st.session_state["stocks"].append(new_stock)
                 st.success("Stock added")
@@ -104,42 +104,35 @@ def main_page():
         # Add a button to delete the stock from the list
         if st.button("Delete stock"):
             stock_to_delete = stock_to_delete.upper()
-            if stock_to_delete in st.session_state["stocks"] and st.session_state.execution.delete_symbol(stock_to_delete) is True:
+            if stock_to_delete in st.session_state["stocks"] and st.session_state.execution.delete_symbol(
+                    stock_to_delete) is True:
                 st.session_state.running_state.pop(stock_to_delete)
                 st.session_state["stocks"].remove(stock_to_delete)
                 st.success("Stock deleted")
             else:
                 st.error("Stock not found or delete failed")
-        if st.button("Home", use_container_width=True):
-            current = ""
-            st.session_state["current_stock"] = ""
+
+        print(st.session_state["stocks"])
         for stock in st.session_state["stocks"]:
             if st.button(stock, use_container_width=True):
                 st.session_state["current_stock"] = stock
-                current = st.session_state["current_stock"]
-                
-    
+
     if st.session_state["current_stock"] != "":
         current = st.session_state["current_stock"]
-        title_placeholder.title(st.session_state["current_stock"])
+        title_placeholder.title(current)
         options = ["Trading History", "Graph", "Bot Info", "Settings"]
         selected_option = st.selectbox("Select an option", options)
 
         if selected_option == "Trading History":
-            if current == "AMZN":
+            if current == "BAC":
                 st.dataframe(data)
-            if current == "TSLA":
+            if current == "KO":
                 st.dataframe(data2)
             else:
                 st.text("This should be data")
         elif selected_option == "Graph":
-            if current == "AMZN":
-                st.plotly_chart(figure)
-            else:
-                st.text("This should be graph")
+            display_graph(current)
         elif selected_option == "Bot Info":
-            current = st.session_state["current_stock"]
-            print(current)
             is_running = st.session_state.running_state[current]
             if not is_running:
                 if st.button("Create bot"):
@@ -147,6 +140,13 @@ def main_page():
                     st.session_state.running_state[current] = True
                     st.experimental_rerun()
             else:
+                # Get the current bot's paused state
+                paused = st.session_state.execution._BOTS[current].paused
+                if paused:
+                    st.error("Bot is paused")
+                else:
+                    st.success("Bot is running")
+
                 col1, col2, col3 = st.columns(3)
                 with col1:
                     if st.button("Reset bot"):
@@ -156,16 +156,20 @@ def main_page():
                 with col2:
                     if st.button("Pause bot"):
                         st.session_state.execution.pause_bot(current)
+                        st.experimental_rerun()
                 with col3:
                     if st.button("Start bot"):
                         st.session_state.execution.start_bot(current)
+                        st.experimental_rerun()
         elif selected_option == "Settings":
             st.text("This is setting")
 
     else:
-        title_placeholder.title("Select a stock on the left")
-        home_page()
-    #     st.error("No stock selected")
+        title_placeholder.title("Dashboard")
+        col_equity, col_buying_power, col_cash = st.columns(3)
+        col_equity.metric("Equity", st.session_state.execution.api.get_account().equity)
+        col_buying_power.metric("Buying Power", st.session_state.execution.api.get_account().buying_power)
+        col_cash.metric("Cash", st.session_state.execution.api.get_account().cash)
 
 
 def login_page():
@@ -193,9 +197,6 @@ if __name__ == "__main__":
     if "secret" not in st.session_state:
         st.session_state["secret"] = None
 
-    # Initialize the execution if it doesn't exist
-    if "execution" not in st.session_state:
-        st.session_state["execution"] = None
     # Initialize the login_credential if it doesn't exist
     if "login_credential" not in st.session_state:
         st.session_state["login_credential"] = None
@@ -206,6 +207,6 @@ if __name__ == "__main__":
 
     if st.session_state["is_logged_in"]:
         main_page()
-        
+
     else:
         login_page()
