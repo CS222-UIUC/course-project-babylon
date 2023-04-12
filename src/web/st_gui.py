@@ -9,6 +9,8 @@ import plotly
 import streamlit as st
 from src.api import api_class
 import streamlit_authenticator as stauth
+import src.candle.grass
+import streamlit.components.v1 as components
 
 file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
@@ -40,7 +42,7 @@ figure.update_layout(
     title="Amazon Price", yaxis_title="Amazon Stock Price USD ($)", xaxis_title="Date"
 )
 
-
+sent = False
 def home_page():
     col_equity, col_buying_power, col_cash = st.columns(3)
     col_equity.metric("Equity", st.session_state.execution.api.get_account().equity)
@@ -53,12 +55,14 @@ def stock_page():
 def main_page():
     # Initialize the execution class
     st.session_state.execution = Execution(st.session_state["login_credential"])
+    
+    if "current_stock" not in st.session_state:
+        st.session_state["current_stock"] = ""
     # Create a dictionary to store the running state of each bot
     if "running_state" not in st.session_state:
         st.session_state.running_state = {"AMZN": False, "TSLA": False, "LMT": False}
 
-    if "current_stock" not in st.session_state:
-        st.session_state["current_stock"] = ""
+    
         
     title_placeholder = (
         st.empty()
@@ -123,8 +127,9 @@ def main_page():
         current = st.session_state["current_stock"]
         title_placeholder.title(st.session_state["current_stock"])
         options = ["Trading History", "Graph", "Bot Info", "Settings"]
+        selected_option = ""
         selected_option = st.selectbox("Select an option", options)
-
+        
         if selected_option == "Trading History":
             if current == "AMZN":
                 st.dataframe(data)
@@ -133,10 +138,12 @@ def main_page():
             else:
                 st.text("This should be data")
         elif selected_option == "Graph":
-            if current == "AMZN":
-                st.plotly_chart(figure)
-            else:
-                st.text("This should be graph")
+            # if current == "AMZN":
+            #     st.plotly_chart(figure)
+            # else:
+            #     st.text("This should be graph")
+            print(current)
+            components.html(src.candle.grass.display_graph())
         elif selected_option == "Bot Info":
             current = st.session_state["current_stock"]
             print(current)
@@ -166,6 +173,7 @@ def main_page():
         title_placeholder.title("Select a stock on the left")
         home_page()
     #     st.error("No stock selected")
+    sent = True
 
 
 def login_page():
@@ -205,7 +213,8 @@ if __name__ == "__main__":
         st.session_state["is_logged_in"] = False
 
     if st.session_state["is_logged_in"]:
-        main_page()
+            main_page()
         
     else:
+        st.session_state["current_stock"] = ""
         login_page()

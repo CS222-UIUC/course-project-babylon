@@ -38,16 +38,18 @@ def write_html_file(symbol):
     </script>
   </div>
   <!-- TradingView Widget END -->'''
-  with open('currentstock.html', 'w') as f:
+  with open('src\candle\currentstock.html', 'w') as f:
       f.write(html)
 
 def display_graph(symbol='RTX'):
   file_name = 'currentstock.html'
   write_html_file(symbol)
   st.header("test html import")
-  HtmlFile = open(file_name, 'r', encoding='utf-8')
+  HtmlFile = open('src\candle\currentstock.html', 'r', encoding='utf-8')
   source_code = HtmlFile.read() 
-  print(source_code)
+  # print(source_code)
   components.html(source_code,width=1000, height=500)
+  return source_code
 
-display_graph()
+part = display_graph()
+# components.html(part, header,descriotion)
