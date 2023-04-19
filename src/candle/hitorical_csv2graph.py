@@ -1,6 +1,6 @@
 """ 
 --Liang created Mar 10 2023--
-last update Mar 10 2023
+last update Apr 19 2023
 
 importable def that turn historical data to candle charts
 
@@ -24,6 +24,7 @@ from api import api_class
 Execution = api_class.Execution
 
 # plot static trading signals, and/or addtional user-defined data.
+#function for creating candle type 1
 def type1_candle(file):
     data = pd.read_csv(file)
     data.columns
@@ -45,6 +46,7 @@ def type1_candle(file):
 
 
 # plot historical data, time length changeable.
+#function for creating candle type 2
 def type2_candle(file):
     df = pd.read_csv(file)
     df = df.set_index(pd.DatetimeIndex(df["Date"].values))
@@ -71,7 +73,7 @@ def type2_candle(file):
 app = Dash()
 # app = Dash(external_stylesheets= [dbc.themes.CYBORG])
 
-
+#function for creating candle type 3
 def type3_candle():
     app.layout = html.Div(
         [
