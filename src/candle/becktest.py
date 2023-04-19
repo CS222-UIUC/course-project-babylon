@@ -5,6 +5,7 @@ from alpaca_trade_api.rest import TimeFrame
 # pandas for analysis
 import pandas as pd
 
+
 API_SECRET = "0GOzkmT1F5W9rs8czJ90YAXKZrBn6jee3BgGo9le"
 API_KEY = "PKNKABC4NQ6UURX5RU4R"
 BASE_URL = 'https://paper-api.alpaca.markets'

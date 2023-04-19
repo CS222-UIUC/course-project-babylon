@@ -5,6 +5,7 @@ import streamlit as st
 last update Apr 19 2023
 """ 
 
+
 """
     Write an HTML file with the TradingView Widget for a given symbol.
 
