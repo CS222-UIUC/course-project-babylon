@@ -1,13 +1,8 @@
-import time
-
 from src.api.api_class import *
 from src.candle.grass import *
 import pandas as pd
-import mplfinance as mpf
-import pandas_datareader as web
 import plotly.graph_objs as go
 import streamlit as st
-import threading
 
 file = "src/web/AMZN.csv"
 data = pd.read_csv(file)
@@ -65,7 +60,7 @@ def main_page():
     with st.sidebar:
         col1, col2 = st.columns(2)
         with col1:
-            # User profile picture and user name
+            # User profile picture and username
             st.image("https://www.pngkit.com/png/full/165-1650218_at-the-movies-will-smith-meme-tada.png", width=145)
         with col2:
             if st.button("Dashboard", use_container_width=True):
@@ -105,7 +100,6 @@ def main_page():
             else:
                 message_placeholder.error("Bot setting update failed")
             st.session_state["update_status"] = 0
-
 
         # Add an input text field for the user to input a new stock symbol
         new_stock = st.text_input("Enter a new stock symbol:")
@@ -169,8 +163,8 @@ def main_page():
                     st.session_state.running_state[current] = True
                     st.experimental_rerun()
             else:
-                # Get the current bot's paused state
-                paused = st.session_state.execution._BOTS[current].paused
+                # Get the current bot paused state
+                paused = st.session_state.execution.get_paused(current)
                 if paused:
                     st.error("Bot is paused")
                 else:
@@ -210,7 +204,8 @@ def main_page():
                 # Add a button to update the settings
                 if st.button("Save"):
                     # Check if the new settings are valid
-                    if time_frame in ["1Min", "5Min", "15Min", "1H", "1D"] and rsi_period.isdigit() and rsi_upper.isdigit() \
+                    if time_frame in ["1Min", "5Min", "15Min", "1H",
+                                      "1D"] and rsi_period.isdigit() and rsi_upper.isdigit() \
                             and rsi_lower.isdigit():
                         # Update the settings
                         st.session_state.execution.set_timeframe(current, time_frame)
@@ -223,7 +218,6 @@ def main_page():
                         st.error("Invalid settings")
                         st.session_state["update_status"] = 2
                         st.experimental_rerun()
-
 
     else:
         title_placeholder.title("Dashboard")
