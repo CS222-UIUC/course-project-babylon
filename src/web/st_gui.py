@@ -144,7 +144,7 @@ def main_page():
     if st.session_state["current_stock"] != "":
         current = st.session_state["current_stock"]
         title_placeholder.title(current)
-        options = ["Trading History", "Graph", "Bot Info", "Settings"]
+        options = ["Trading History", "Graph", "Bot Settings", "Settings"]
         selected_option = st.selectbox("Select an option", options)
 
         if selected_option == "Trading History":
@@ -156,11 +156,22 @@ def main_page():
                 st.text("This should be data")
         elif selected_option == "Graph":
             display_graph(current)
-        elif selected_option == "Bot Info":
+        elif selected_option == "Bot Settings":
             is_running = st.session_state.running_state[current]
+            time_frame = ""
+            rsi_period = ""
+            rsi_upper = ""
+            rsi_lower = ""
+            time_frame = st.text_input("Set your timeframe here:","5Min")
+            rsi_period = st.text_input("Set you rsi period here:", "9")
+            rsi_upper = st.text_input("Set your rsi upper here:", "70")
+            rsi_lower = st.text_input("Set yout rsi lower here:", "30")
             if not is_running:
                 if st.button("Create bot"):
-                    st.session_state.execution.create_bot(current)
+                    if (time_frame == "" or rsi_lower == "" or rsi_period == "" or rsi_upper == ""):
+                        st.session_state.execution.create_bot(current)
+                    else:
+                        st.session_state.execution.create_bot(current, time_frame = time_frame, rsi_period=rsi_period, rsi_upper= rsi_upper, rsi_lower=rsi_lower)
                     st.session_state.running_state[current] = True
                     st.experimental_rerun()
             else:
