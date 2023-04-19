@@ -51,29 +51,18 @@ def write_html_file(symbol):
     </script>
   </div>
   <!-- TradingView Widget END -->'''
-<<<<<<< HEAD
-
-  # Write the HTML code to the 'currentstock.html' file
-  with open('currentstock.html', 'w') as f:
-=======
   with open('src\candle\currentstock.html', 'w') as f:
->>>>>>> 278282fb5cfc52d246a9cab05e79b2b7fd8da3f0
       f.write(html)
 """
     Display the stock graph for a given symbol using Streamlit and a TradingView Widget.
 
-<<<<<<< HEAD
     Args:
         symbol (str, optional): The stock symbol to display. Defaults to 'RTX'.
 """
 def display_graph(symbol='RTX'):
-=======
-def display_graph(symbol):
->>>>>>> 278282fb5cfc52d246a9cab05e79b2b7fd8da3f0
   file_name = 'currentstock.html'
   # Write the TradingView Widget HTML for the given symbol
   write_html_file(symbol)
-<<<<<<< HEAD
   # Display a header in the Streamlit app
   st.header("test html import")
   # Read the contents of the generated HTML file
@@ -82,12 +71,6 @@ def display_graph(symbol):
   # Print the source code (for debugging purposes) 
   print(source_code)
   # Display the TradingView Widget in the Streamlit app using the components module
-=======
-  # st.header("test html import")
-  HtmlFile = open('src\candle\currentstock.html', 'r', encoding='utf-8')
-  source_code = HtmlFile.read() 
-  # print(source_code)
->>>>>>> 278282fb5cfc52d246a9cab05e79b2b7fd8da3f0
   components.html(source_code,width=1000, height=500)
   return source_code
 
