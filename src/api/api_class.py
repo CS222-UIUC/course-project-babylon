@@ -105,6 +105,9 @@ class Execution:
         else:
             print("set_account: NO CLIENT FOUND")
 
+    def get_paused(self, symbol):
+        return self._BOTS[symbol].paused
+
     def get_account_cash(self):
         return float(self.account.cash)
 
@@ -116,7 +119,7 @@ class Execution:
 
     def add_symbol(self, symbol: str):
         valid_symbol = self.check_symbol(symbol)
-        if valid_symbol is -1:
+        if valid_symbol == -1:
             return False
         self._SYMBOLS.append(symbol)
         self._BOTS[symbol] = None  # unset
