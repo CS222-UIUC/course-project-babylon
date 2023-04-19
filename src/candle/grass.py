@@ -60,7 +60,7 @@ def write_html_file(symbol):
         symbol (str, optional): The stock symbol to display. Defaults to 'RTX'.
 """
 def display_graph(symbol='RTX'):
-  file_name = 'currentstock.html'
+  file_name = 'src/candle/currentstock.html'
   # Write the TradingView Widget HTML for the given symbol
   write_html_file(symbol)
   # Display a header in the Streamlit app
