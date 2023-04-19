@@ -87,6 +87,9 @@ def main_page():
         if "delete_status" not in st.session_state:
             st.session_state["delete_status"] = 0  # 0 = not deleted, 1 = deleted, 2 = failed
 
+        if "update_status" not in st.session_state:
+            st.session_state["update_status"] = 0  # 0 = not updated, 1 = updated, 2 = failed
+
         # Create an empty placeholder to display the success/failure message
         message_placeholder = st.empty()
         if st.session_state["add_status"] != 0:
@@ -101,6 +104,13 @@ def main_page():
             else:
                 message_placeholder.error("Stock not found or delete failed")
             st.session_state["delete_status"] = 0
+        elif st.session_state["update_status"] != 0:
+            if st.session_state["update_status"] == 1:
+                message_placeholder.success("Bot setting successfully updated")
+            else:
+                message_placeholder.error("Bot setting update failed")
+            st.session_state["update_status"] = 0
+
 
         # Add an input text field for the user to input a new stock symbol
         new_stock = st.text_input("Enter a new stock symbol:")
@@ -144,7 +154,7 @@ def main_page():
     if st.session_state["current_stock"] != "":
         current = st.session_state["current_stock"]
         title_placeholder.title(current)
-        options = ["Trading History", "Graph", "Bot Settings", "Settings"]
+        options = ["Trading History", "Graph", "Bot Status", "Bot Settings"]
         selected_option = st.selectbox("Select an option", options)
 
         if selected_option == "Trading History":
@@ -156,22 +166,11 @@ def main_page():
                 st.text("This should be data")
         elif selected_option == "Graph":
             display_graph(current)
-        elif selected_option == "Bot Settings":
+        elif selected_option == "Bot Info":
             is_running = st.session_state.running_state[current]
-            time_frame = ""
-            rsi_period = ""
-            rsi_upper = ""
-            rsi_lower = ""
-            time_frame = st.text_input("Set your timeframe here:","5Min")
-            rsi_period = st.text_input("Set you rsi period here:", "9")
-            rsi_upper = st.text_input("Set your rsi upper here:", "70")
-            rsi_lower = st.text_input("Set yout rsi lower here:", "30")
             if not is_running:
                 if st.button("Create bot"):
-                    if (time_frame == "" or rsi_lower == "" or rsi_period == "" or rsi_upper == ""):
-                        st.session_state.execution.create_bot(current)
-                    else:
-                        st.session_state.execution.create_bot(current, time_frame = time_frame, rsi_period=rsi_period, rsi_upper= rsi_upper, rsi_lower=rsi_lower)
+                    st.session_state.execution.create_bot(current)
                     st.session_state.running_state[current] = True
                     st.experimental_rerun()
             else:
@@ -197,7 +196,39 @@ def main_page():
                         st.session_state.execution.start_bot(current)
                         st.experimental_rerun()
         elif selected_option == "Settings":
-            st.text("This is setting")
+            is_running = st.session_state.running_state[current]
+            if not is_running:
+                st.error("Bot must be running to change settings, please create a bot first under the Bot Info tab")
+            else:
+                # Get the current bot's time_frame, rsi_period, rsi_upper and rsi_lower
+                time_frame_old = st.session_state.execution.get_timeframe(current)
+                rsi_period_old = st.session_state.execution.get_rsi_period(current)
+                rsi_upper_old = st.session_state.execution.get_rsi_upper(current)
+                rsi_lower_old = st.session_state.execution.get_rsi_lower(current)
+
+                # Display the current settings in the text input fields
+                time_frame = st.text_input("Time frame", time_frame_old, help="Choose from 1Min, 5Min, 15Min, 1H, 1D")
+                rsi_period = st.text_input("RSI period", rsi_period_old)
+                rsi_upper = st.text_input("RSI upper", rsi_upper_old)
+                rsi_lower = st.text_input("RSI lower", rsi_lower_old)
+
+                # Add a button to update the settings
+                if st.button("Save"):
+                    # Check if the new settings are valid
+                    if time_frame in ["1Min", "5Min", "15Min", "1H", "1D"] and rsi_period.isdigit() and rsi_upper.isdigit() \
+                            and rsi_lower.isdigit():
+                        # Update the settings
+                        st.session_state.execution.set_timeframe(current, time_frame)
+                        st.session_state.execution.set_rsi_period(current, int(rsi_period))
+                        st.session_state.execution.set_rsi_upper(current, int(rsi_upper))
+                        st.session_state.execution.set_rsi_lower(current, int(rsi_lower))
+                        st.session_state["update_status"] = 1
+                        st.experimental_rerun()
+                    else:
+                        st.error("Invalid settings")
+                        st.session_state["update_status"] = 2
+                        st.experimental_rerun()
+
 
     else:
         title_placeholder.title("Dashboard")
