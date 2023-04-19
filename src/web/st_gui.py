@@ -166,7 +166,7 @@ def main_page():
                 st.text("This should be data")
         elif selected_option == "Graph":
             display_graph(current)
-        elif selected_option == "Bot Info":
+        elif selected_option == "Bot Status":
             is_running = st.session_state.running_state[current]
             if not is_running:
                 if st.button("Create bot"):
@@ -195,7 +195,7 @@ def main_page():
                     if st.button("Start bot", use_container_width=True):
                         st.session_state.execution.start_bot(current)
                         st.experimental_rerun()
-        elif selected_option == "Settings":
+        elif selected_option == "Bot Settings":
             is_running = st.session_state.running_state[current]
             if not is_running:
                 st.error("Bot must be running to change settings, please create a bot first under the Bot Info tab")
