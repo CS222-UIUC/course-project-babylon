@@ -1,6 +1,8 @@
 import os
 import alpaca_trade_api as tradeapi
 import yfinance as yf
+import random as r
+import time
 from math import floor
 
 # from srcbot import bot_class
@@ -24,6 +26,22 @@ def LOGIN(key, secret):
 
 def LOGOUT():
     return None, None, None, None
+
+
+def generate_trading_message(stock_symbol):
+    side = r.choice(["Buy", "Sell"])
+    quantity = r.randint(1, 10)
+    price = round(r.uniform(100, 500), 2)
+    timestamp = time.strftime("%m/%d/%Y, %I:%M:%S %p")
+    message = f"{side} {quantity} {stock_symbol}\t{timestamp}\t{price} USD"
+    return message
+
+
+def simulate_trading(stock_symbol, output):
+    while True:
+        message = generate_trading_message(stock_symbol)
+        output.text(message)
+        time.sleep(r.randint(1, 10))
 
 
 class Execution:
@@ -56,6 +74,30 @@ class Execution:
             rsi_upper=rsi_upper,
             rsi_lower=rsi_lower,
         )
+
+    def set_timeframe(self, symbol, timeframe="5Min"):
+        self._BOTS[symbol].timeframe = timeframe
+
+    def get_timeframe(self, symbol):
+        return self._BOTS[symbol].timeframe
+
+    def set_rsi_period(self, symbol, rsi_period=9):
+        self._BOTS[symbol].rsi_period = rsi_period
+
+    def get_rsi_period(self, symbol):
+        return self._BOTS[symbol].rsi_period
+
+    def set_rsi_upper(self, symbol, rsi_upper=70):
+        self._BOTS[symbol].rsi_upper = rsi_upper
+
+    def get_rsi_upper(self, symbol):
+        return self._BOTS[symbol].rsi_upper
+
+    def set_rsi_lower(self, symbol, rsi_lower=30):
+        self._BOTS[symbol].rsi_lower = rsi_lower
+
+    def get_rsi_lower(self, symbol):
+        return self._BOTS[symbol].rsi_lower
 
     def set_account(self):
         if self.api != None:
