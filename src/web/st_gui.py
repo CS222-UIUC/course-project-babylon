@@ -61,11 +61,6 @@ def main_page():
     title_placeholder = (
         st.empty()
     )  # Creates an empty placeholder so that the text in it can be changed later
-    # if st.session_state["current_stock"] == "":
-    #     title_placeholder.title("Select a stock on the left")
-
-    # else:
-    #     title_placeholder.title(st.session_state["current_stock"])
 
     with st.sidebar:
         col1, col2 = st.columns(2)
