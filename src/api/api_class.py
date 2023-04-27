@@ -3,6 +3,7 @@ import alpaca_trade_api as tradeapi
 import yfinance as yf
 import random as r
 import time
+import pandas as pd
 from math import floor
 
 # from srcbot import bot_class
@@ -11,7 +12,6 @@ from src.bot.bot_class import BOT, logs
 from alpaca_trade_api.rest import REST, TimeFrame, TimeFrameUnit
 from datetime import timezone, datetime, timedelta
 # logs = bot_class.logs
-import pandas as pd
 
 
 def LOGIN(key, secret):
@@ -28,20 +28,21 @@ def LOGOUT():
     return None, None, None, None
 
 
-def generate_trading_message(stock_symbol):
+def generate_trading_message(stock_symbol, api_key):
+    # read history file
+    history_file = pd.read_csv("./data/" + api_key + "/" + stock_symbol + ".csv")
     side = r.choice(["Buy", "Sell"])
     quantity = r.randint(1, 10)
     price = round(r.uniform(100, 500), 2)
-    timestamp = time.strftime("%m/%d/%Y, %I:%M:%S %p")
-    message = f"{side} {quantity} {stock_symbol}\t{timestamp}\t{price} USD"
+    date = datetime.now().strftime("%m-%d-%Y")
+    time = datetime.now().strftime("%H:%M:%S")
+    message = f"{side} {quantity} {stock_symbol}\t{date} {time}\t{price} USD"
+    # append to history file
+    message_data = pd.DataFrame([[f"{side} {quantity} {stock_symbol}", date, time, f"{price} USD"]], columns=["Action", "Date", "Time", "Transaction"])
+    history_file = pd.concat([history_file, message_data], ignore_index=True, axis=0)
+    # save history file
+    history_file.to_csv("./data/" + api_key + "/" + stock_symbol + ".csv", index=False)
     return message
-
-
-def simulate_trading(stock_symbol, output):
-    while True:
-        message = generate_trading_message(stock_symbol)
-        output.text(message)
-        time.sleep(r.randint(1, 10))
 
 
 class Execution:
@@ -163,6 +164,25 @@ class Execution:
 
     def reset_bot(self, symbol):
         self._BOTS[symbol] = -1
+
+    def simulate_trading(self, symbol, api_key):
+        # check if the bot is paused
+        if not self._BOTS[symbol].paused:
+            placeholder = st.empty()
+            output = st.empty()
+            while True:
+                placeholder.empty()
+                output.empty()
+                message = generate_trading_message(symbol, api_key)
+                # display history
+                history = pd.read_csv("./data/" + api_key + "/" + symbol + ".csv")
+                placeholder = st.dataframe(history, width=1000)
+                output = st.info(message, icon="ℹ️")
+                # print history
+                time.sleep(r.randint(5, 20))
+        else:
+            history = pd.read_csv("./data/" + api_key + "/" + symbol + ".csv")
+            st.dataframe(history, width=1000)
 
     def start_all_bots(self):
         for bot in self._BOTS:
