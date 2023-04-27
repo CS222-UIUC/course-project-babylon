@@ -1,57 +1,47 @@
 from src.api.api_class import *
 from src.candle.grass import *
 import pandas as pd
-import plotly.graph_objs as go
 import streamlit as st
-
-file = "src/web/AMZN.csv"
-data = pd.read_csv(file)
-data.Date = pd.to_datetime(data.Date)
-# data.info()
-data = data.set_index("Date")
-
-file2 = "src/web/TSLA.csv"
-data2 = pd.read_csv(file2)
-data2.Date = pd.to_datetime(data2.Date)
-# data.info()
-data2 = data2.set_index("Date")
-
-df = pd.read_csv(file)
-df = df.set_index(pd.DatetimeIndex(df["Date"].values))
-figure = go.Figure(
-    data=[
-        go.Candlestick(
-            x=df.index,
-            low=df["Low"],
-            high=df["High"],
-            open=df["Open"],
-            close=df["Close"],
-        )
-    ]
-)
-
-figure.update_layout(
-    title="Amazon Price", yaxis_title="Amazon Stock Price USD ($)", xaxis_title="Date"
-)
 
 
 def main_page():
     # Initialize the execution if it doesn't exist
     if "execution" not in st.session_state:
         st.session_state.execution = Execution(st.session_state["login_credential"])
-        st.session_state.execution.add_symbol("BAC")
-        st.session_state.execution.add_symbol("KO")
-        st.session_state.execution.add_symbol("RACE")
-    # Create a dictionary to store the running state of each bot
-    if "running_state" not in st.session_state:
-        st.session_state.running_state = {"BAC": False, "KO": False, "RACE": False}
-
-    if "current_stock" not in st.session_state:
-        st.session_state["current_stock"] = ""
+        # create an empty folder named as login_credential if it doesn't exist
+        if not os.path.exists("./data/" + st.session_state.api_key):
+            os.makedirs("./data/" + st.session_state.api_key)
 
     # Initialize the session_state if it doesn't exist
     if "stocks" not in st.session_state:
-        st.session_state["stocks"] = ["BAC", "KO", "RACE"]
+        # create a csv file named stocks.csv if it doesn't exist
+        if not os.path.exists("./data/" + st.session_state.api_key + "/stocks.csv"):
+            # create an empty csv file
+            pd.DataFrame(columns=["Names"]).to_csv(
+                "./data/" + st.session_state.api_key + "/stocks.csv", index=False
+            )
+        # read the csv file and store the symbols in the session_state
+        st.session_state["stocks"] = pd.read_csv(
+            "./data/" + st.session_state.api_key + "/stocks.csv"
+        ).Names.tolist()
+
+        # add the symbols to the execution and create csv file named symbol.csv
+        for symbol in st.session_state["stocks"]:
+            st.session_state.execution.add_symbol(symbol)
+            if not os.path.exists("./data/" + st.session_state.api_key + "/" + symbol + ".csv"):
+                # create an empty csv file
+                pd.DataFrame(columns=["Action", "Date", "Time", "Transaction"]).to_csv(
+                    "./data/" + st.session_state.api_key + "/" + symbol + ".csv", index=False
+                )
+
+    # Create a dictionary to store the running state of each bot
+    if "running_state" not in st.session_state:
+        st.session_state["running_state"] = {}
+        for symbol in st.session_state["stocks"]:
+            st.session_state["running_state"][symbol] = False
+
+    if "current_stock" not in st.session_state:
+        st.session_state["current_stock"] = ""
 
     title_placeholder = (
         st.empty()
@@ -112,6 +102,14 @@ def main_page():
                 st.session_state.running_state[new_stock] = False
                 st.session_state["stocks"].append(new_stock)
                 st.session_state["add_status"] = 1
+                # Update the csv file
+                pd.DataFrame(st.session_state["stocks"], columns=["Names"]).to_csv(
+                    "./data/" + st.session_state.api_key + "/stocks.csv", index=False
+                )
+                # Create a csv file for the new stock
+                pd.DataFrame(columns=["Action", "Date", "Time", "Transaction"]).to_csv(
+                    "./data/" + st.session_state.api_key + "/" + new_stock + ".csv", index=False
+                )
                 st.experimental_rerun()
             else:
                 st.error("Stock already exists or invalid symbol")
@@ -130,6 +128,12 @@ def main_page():
                 st.session_state.running_state.pop(stock_to_delete)
                 st.session_state["stocks"].remove(stock_to_delete)
                 st.session_state["delete_status"] = 1
+                # Update the csv file
+                pd.DataFrame(st.session_state["stocks"], columns=["Names"]).to_csv(
+                    "./data/" + st.session_state.api_key + "/stocks.csv", index=False
+                )
+                # Delete the csv file for the stock
+                os.remove("./data/" + st.session_state.api_key + "/" + stock_to_delete + ".csv")
                 st.experimental_rerun()
             else:
                 st.error("Stock not found or delete failed")
@@ -141,21 +145,18 @@ def main_page():
                 st.session_state["current_stock"] = stock
 
     if st.session_state["current_stock"] != "":
+        st.empty()
+
         current = st.session_state["current_stock"]
         title_placeholder.title(current)
-        options = ["Trading History", "Graph", "Bot Status", "Bot Settings"]
+        options = ["Graph", "Bot Status", "Bot Settings"]
         selected_option = st.selectbox("Select an option", options)
 
-        if selected_option == "Trading History":
-            if current == "BAC":
-                st.dataframe(data)
-            if current == "KO":
-                st.dataframe(data2)
-            else:
-                st.text("This should be data")
-        elif selected_option == "Graph":
+        if selected_option == "Graph":
             display_graph(current)
         elif selected_option == "Bot Status":
+            st.empty()
+            st.empty()
             is_running = st.session_state.running_state[current]
             if not is_running:
                 if st.button("Create bot"):
@@ -184,12 +185,14 @@ def main_page():
                     if st.button("Start bot", use_container_width=True):
                         st.session_state.execution.start_bot(current)
                         st.experimental_rerun()
+
+                st.session_state.execution.simulate_trading(current, st.session_state.api_key)
         elif selected_option == "Bot Settings":
             is_running = st.session_state.running_state[current]
             if not is_running:
                 st.error("Bot must be running to change settings, please create a bot first under the Bot Info tab")
             else:
-                # Get the current bot's time_frame, rsi_period, rsi_upper and rsi_lower
+                # Get the current bot time_frame, rsi_period, rsi_upper and rsi_lower
                 time_frame_old = st.session_state.execution.get_timeframe(current)
                 rsi_period_old = st.session_state.execution.get_rsi_period(current)
                 rsi_upper_old = st.session_state.execution.get_rsi_upper(current)
