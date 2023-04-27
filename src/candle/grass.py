@@ -1,10 +1,8 @@
 import streamlit.components.v1 as components  # Import Streamlit
-import streamlit as st
 """ 
 --Liang created Apr 2 2023--
 last update Apr 19 2023
-""" 
-
+"""
 
 """
     Write an HTML file with the TradingView Widget for a given symbol.
@@ -15,24 +13,26 @@ last update Apr 19 2023
     Returns:
         None: The function writes the TradingView Widget HTML to 'currentstock.html'.
 """
+
+
 def write_html_file(symbol):
-  html = '''<!-- TradingView Widget BEGIN -->
+    html = '''<!-- TradingView Widget BEGIN -->
 <div class="tradingview-widget-container">
     <div class="tradingview-widget-container__widget"></div>
-    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/NYSE-'''+symbol+'''/" rel="noopener" target="_blank"><span class="blue-text">'''+symbol+''' stock price</span></a> by TradingView</div>
+    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/NYSE-''' + symbol + '''/" rel="noopener" target="_blank"><span class="blue-text">''' + symbol + ''' stock price</span></a> by TradingView</div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-overview.js" async>
     {
     "symbols": [
       [
         "a",
-        "NYSE:'''+symbol+'''|1D"
+        "''' + symbol + '''|1D"
       ]
     ],
     "chartOnly": false,
-    "width": 1000,
+    "width": 690,
     "height": 500,
     "locale": "en",
-    "colorTheme": "light",
+    "colorTheme": "dark",
     "autosize": false,
     "showVolume": false,
     "showMA": false,
@@ -51,28 +51,31 @@ def write_html_file(symbol):
     </script>
   </div>
   <!-- TradingView Widget END -->'''
-  with open('src\candle\currentstock.html', 'w') as f:
-      f.write(html)
+    with open('src\candle\currentstock.html', 'w') as f:
+        f.write(html)
+
+
 """
     Display the stock graph for a given symbol using Streamlit and a TradingView Widget.
 
     Args:
         symbol (str, optional): The stock symbol to display. Defaults to 'RTX'.
 """
+
+
 def display_graph(symbol='RTX'):
-  file_name = 'src/candle/currentstock.html'
-  # Write the TradingView Widget HTML for the given symbol
-  write_html_file(symbol)
-  # Display a header in the Streamlit app
-  st.header("test html import")
-  # Read the contents of the generated HTML file
-  HtmlFile = open(file_name, 'r', encoding='utf-8')
-  source_code = HtmlFile.read()
-  # Print the source code (for debugging purposes) 
-  print(source_code)
-  # Display the TradingView Widget in the Streamlit app using the components module
-  components.html(source_code,width=1000, height=500)
-  return source_code
+    file_name = 'src/candle/currentstock.html'
+
+    # Write the TradingView Widget HTML for the given symbol
+    write_html_file(symbol)
+    # Read the contents of the generated HTML file
+    HtmlFile = open(file_name, 'r', encoding='utf-8')
+    source_code = HtmlFile.read()
+    # Print the source code (for debugging purposes)
+    # print(source_code)
+    # Display the TradingView Widget in the Streamlit app using the components module
+    components.html(source_code, width=700, height=500)
+    return source_code
 
 # part = display_graph()
 # components.html(part, header,descriotion)
