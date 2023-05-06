@@ -8,7 +8,6 @@ This project proposes the creation of an Automated Trading Bot that will use a t
 - Events Class: This class handles log-related tasks, such as displaying and deleting logs.
 - BOT Class: The core trading bot class that implements the trading strategy, interacts with the Alpaca API, and performs trading operations.
 - Alpaca API: The Alpaca trading platform API that your application interacts with to fetch market data, submit orders, and manage positions.
-- TA-Lib: A technical analysis library used for calculating RSI (Relative Strength Index) values.
 - Logging Module: A module for logging messages and events related to the trading bot's activities.
 - Data Storage: Represents the storage for log data.
 #### Web-UI Interface (Developed by Jingyan Hu and Xinyi Ye):
@@ -24,7 +23,7 @@ This project proposes the creation of an Automated Trading Bot that will use a t
 - Follow the instruction to install [Ta-Lib](https://pypi.org/project/TA-Lib/)
 - To run the application: `python3 -m streamlit run .\src\web\st_gui.py` or `streamlit run .\src\web\st_gui.py`
 ## Group Members
-- Tass Hu: working on most of the backend part, including the algorithm of trading bot, Alpaca API connections, and provide supportive functionalities to the frontend
-- Chaoxiong Liang: working on Alpaca API connections, making real-time, interactive graphs based on data gathered
-- Jingyan Hu: working on the web interface, integrating functionalities that require user access
+- Tass Hu: working on most of the backend part, including the algorithm of trading bot, fastAPI, and Alpaca API connections
+- Chaoxiong Liang: working on data visualizations of the performance of algos, creating real-time, interactive graphs based on streaming data
+- Jingyan Hu: working on the web interface, gui design, and design of overall structure of the web, integrating functionalities that require user access
 - Xinyi Ye: working on the web interface, integrating functionalities that require user access
