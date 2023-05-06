@@ -2,7 +2,7 @@
 ## Summary
 This project proposes the creation of an Automated Trading Bot that will use a trading algorithm designed in Python to make trades based on market data. The bot will connect to the Alpaca API to gather the necessary data and make trades on behalf of the user. The results of the trades will be displayed on a web interface designed using Streamlit for users to monitor the performance of the bots.
 ## Technical Architecture
-### Trading Algorithm (Developed by Yunfan Hu):
+#### Trading Algorithm (Developed by Yunfan Hu):
 - API Class: This class handles the login and logout process and provides functions to manage the trading bot.
 - Execution Class: This class is responsible for creating and managing instances of the trading bot, as well as handling trading activities.
 - Events Class: This class handles log-related tasks, such as displaying and deleting logs.
@@ -11,11 +11,11 @@ This project proposes the creation of an Automated Trading Bot that will use a t
 - TA-Lib: A technical analysis library used for calculating RSI (Relative Strength Index) values.
 - Logging Module: A module for logging messages and events related to the trading bot's activities.
 - Data Storage: Represents the storage for log data.
-### Web-UI Interface (Developed by Jingyan Hu and Xinyi Ye):
+#### Web-UI Interface (Developed by Jingyan Hu and Xinyi Ye):
 - Constructed with Streamlit API, intergrating all needed functionalities from the backend and making them user friendly.
 - Represents real-time interactive stock trends with TradingView's graph feature
 - Allows users to view trading status and adjust bot settings in a simplified manner
-### Alpaca API (Developed by Alpaca):
+#### Alpaca API (Developed by Alpaca):
 - Gathers real-time market data for the trading algorithm
 - Interactable with the trading algorithem through HTTP requests
 ## Installation Instruction
